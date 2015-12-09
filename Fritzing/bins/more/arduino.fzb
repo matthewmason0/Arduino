@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module fritzingVersion="0.6.4" icon="Arduino.png">
+    <title>Arduino</title>
+	<instances>
+          <instance moduleIdRef="__spacer__" modelIndex="3" path="Arduino Boards">
+        <views>
+          <iconView layer="icon">
+            <geometry z="-1" x="-1" y="-1"></geometry>
+          </iconView>
+        </views>
+      </instance>
+   	    <instance moduleIdRef="arduino_Uno_Rev3(fix)" modelIndex="5548" path="pdb/core/arduino_Uno_Rev3(fix).fzp">
+          <views>
+              <iconView layer="icon">
+                  <geometry z="-1" x="-1" y="-1"/>
+              </iconView>
+          </views>
+      </instance>
+	     	    <instance moduleIdRef="Arduino_bt07" modelIndex="5548" path="pdb/core/Arduino_bt07.fzp">
+          <views>
+              <iconView layer="icon">
+                  <geometry z="-1" x="-1" y="-1"/>
+              </iconView>
+          </views>
+      </instance>
+	  <instance moduleIdRef="Arduino_MEGA_2560-Rev3(fix)" modelIndex="5584" path="pdb/core/Arduino_MEGA_2560-Rev3(fix).fzp" >
+            <views>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+            </views>
+        </instance>
+         <instance moduleIdRef="Arduino_ADK_MEGA_2560-Rev3(fix)" modelIndex="5584" path="pdb/core/Arduino_ADK_MEGA_2560-Rev3(fix).fzp" >
+            <views>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+            </views>
+        </instance>
+        <instance moduleIdRef="Arduino DUE V02b" modelIndex="5584" path="pdb/core/Arduino_DUE_V02b.fzp" >
+            <views>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+            </views>
+        </instance>
+        <instance moduleIdRef="Arduino Nano3(fix)" modelIndex="5584" path="pdb/core/Arduino Nano3(fix).fzp">
+            <views>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+            </views>
+        </instance>
+        <instance moduleIdRef="Arduino_Ethernet" modelIndex="5584" path="pdb/core/Arduino_Ethernet.fzp" >
+            <views>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+            </views>
+        </instance>
+		    
+        <instance moduleIdRef="Arduino_Esplora" modelIndex="5584" path="pdb/core/Arduino_Esplora.fzp">
+            <views>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+            </views>
+        </instance>
+        <instance moduleIdRef="Arduino_Leonardo_Rev3(fix)" modelIndex="5584" path="pdb/core/Arduino_Leonardo_Rev3
+            (fix).fzp" >
+            <views>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+            </views>
+        </instance>
+        <instance moduleIdRef="Arduino-Pro-Mini-v13-a4+5" modelIndex="5584" path="pdb/core/Arduino-Pro-Mini-v13-a4+5.fzp" >
+            <views>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+            </views>
+        </instance>
+	    <instance moduleIdRef="Arduino_Micro_Rev03(fix)" modelIndex="5584" path="pdb/core/Arduino_Micro_Rev03(fix).fzp">
+            <views>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+            </views>
+        </instance>
+		<instance moduleIdRef="Arduino-Mini-v5" modelIndex="5584" path="pdb/core/Arduino-Mini-v5.fzp">
+            <views>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+            </views>
+        </instance>	
+		
+		
+		<instance moduleIdRef="Arduino Pro" modelIndex="5584" path="pdb/core/Arduino_Pro.fzp">
+            <views>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+            </views>
+        </instance>	
+		
+
+						
+		
+						<instance moduleIdRef="Arduino-Fio-v22(fix)" modelIndex="5584" path="pdb/core/Arduino-Fio-v22(fix).fzp">
+            <views>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+            </views>
+        </instance>	
+		
+
+		
+		    <instance moduleIdRef="__spacer__" modelIndex="3" path="Arduino Shields">
+        <views>
+          <iconView layer="icon">
+            <geometry z="-1" x="-1" y="-1"></geometry>
+          </iconView>
+        </views>
+      </instance>
+		
+		
+		<instance moduleIdRef="GSM-Quectel_updateTID_2_v1.3" modelIndex="5584"  path="pdb/core/GSM-Quectel_updateTID_2_v1.3.fzp"  >
+            <views>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+            </views>
+        </instance>
+		
+	    <instance moduleIdRef="Shield_Eth06-PoE" modelIndex="5584"  path="pdb/core/Shield_Eth06-PoE.fzp"  >
+            <views>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+            </views>
+        </instance>
+		<instance moduleIdRef="Arduino Motor Shield rev3" modelIndex="5584" path="pdb/core/Arduino_Motor_Shield_rev3.fzp">
+            <views>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+            </views>
+        </instance>	
+        <instance moduleIdRef="Wireless_SD_v3" modelIndex="5584" >
+            <views>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+            </views>
+        </instance>
+        <instance moduleIdRef="Proto_shield_REV3" modelIndex="5584" >
+            <views>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+            </views>
+        </instance>
+        <instance moduleIdRef="arduinoXbeere" modelIndex="5584" >
+            <views>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+                <iconView layer="">
+                    <geometry z="0" x="-1" y="-1"/>
+                </iconView>
+            </views>
+        </instance>
+	
+    </instances>
+</module>
