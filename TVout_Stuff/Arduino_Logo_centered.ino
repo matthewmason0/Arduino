@@ -1,0 +1,9 @@
+TV.draw_circle(TV.hres()/2-18,TV.vres()/2,20,WHITE,WHITE);
+TV.draw_circle(TV.hres()/2+18,TV.vres()/2,20,WHITE,WHITE);
+TV.draw_circle(TV.hres()/2-18,TV.vres()/2,17,WHITE,BLACK);
+TV.draw_circle(TV.hres()/2+18,TV.vres()/2,17,WHITE,BLACK);
+TV.draw_rect(TV.hres()/2-24,TV.vres()/2-2,12,4,WHITE,WHITE);
+TV.draw_rect(TV.hres()/2+12,TV.vres()/2-2,12,4,WHITE,WHITE);
+TV.draw_rect(TV.hres()/2+16,TV.vres()/2-6,4,12,WHITE,WHITE);
+TV.select_font(font8x8);
+TV.println(TV.hres()/2-28,TV.vres()/2+25,"ARDUINO");

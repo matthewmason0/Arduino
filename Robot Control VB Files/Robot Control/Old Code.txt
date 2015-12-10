@@ -1,0 +1,47 @@
+Public Class Form1
+    Dim WaveL As New NAudio.Wave.WaveOut
+    Dim WaveR As New NAudio.Wave.WaveOut
+    Dim Lsig() As Byte = IO.File.ReadAllBytes("C:\Users\Matthew\GDriveBU\Documents\Arduino\Robot Control\Lsig.wav")
+    Dim Rsig() As Byte = IO.File.ReadAllBytes("C:\Users\Matthew\GDriveBU\Documents\Arduino\Robot Control\Rsig.wav")
+    Dim stopWatchL As New Stopwatch()
+    Dim stopWatchR As New Stopwatch()
+    Me.Cursor = New Cursor(Cursor.Current.Handle)
+    Sub PlaySoundL(ByVal vol As Decimal)
+        Dim data As New IO.MemoryStream(Lsig) 'Data stream for the buffer
+        WaveL.Init(New NAudio.Wave.BlockAlignReductionStream(NAudio.Wave.WaveFormatConversionStream.CreatePcmStream(New NAudio.Wave.WaveFileReader(data))))
+        WaveL.Volume = vol
+        WaveL.Play()
+        stopWatchL.Restart()
+    End Sub
+    Sub PlaySoundR(ByVal vol As Decimal)
+        Dim data As New IO.MemoryStream(Rsig) 'Data stream for the buffer
+        WaveR.Init(New NAudio.Wave.BlockAlignReductionStream(NAudio.Wave.WaveFormatConversionStream.CreatePcmStream(New NAudio.Wave.WaveFileReader(data))))
+        WaveR.Volume = vol
+        WaveR.Play()
+        stopWatchR.Restart()
+    End Sub
+    Private Sub TrackBarL_Scroll(sender As Object, e As EventArgs)
+        WaveL.Volume = TrackBarL.Value / 10.0
+        If stopWatchL.ElapsedMilliseconds >= 30000 Then
+            PlaySoundL(TrackBarL.Value / 10.0)
+        End If
+    End Sub
+    Private Sub TrackBarR_Scroll(sender As Object, e As EventArgs)
+        WaveR.Volume = TrackBarR.Value / 10.0
+        If stopWatchR.ElapsedMilliseconds >= 30000 Then
+            PlaySoundR(TrackBarR.Value / 10.0)
+        End If
+    End Sub
+    Private Sub TrackBarL_MouseUp(sender As Object, e As EventArgs) Handles TrackBarL.MouseUp
+        WaveL.Stop()
+    End Sub
+    Private Sub TrackBarR_MouseUp(sender As Object, e As EventArgs) Handles TrackBarR.MouseUp
+        WaveR.Stop()
+    End Sub
+    Private Sub TrackBarL_MouseDown(sender As Object, e As EventArgs) Handles TrackBarL.MouseDown
+        PlaySoundL(TrackBarL.Value / 10.0)
+    End Sub
+    Private Sub TrackBarR_MouseDown(sender As Object, e As EventArgs) Handles TrackBarR.MouseDown
+        PlaySoundR(TrackBarR.Value / 10.0)
+    End Sub
+End Class
