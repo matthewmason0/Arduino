@@ -1,6 +1,6 @@
   //HzMeter v1.0
   //Created by Matthew Mason,
-  //February 2013
+  //February 2014
 
 /*
 Pin Setup:
