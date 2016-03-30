@@ -6,12 +6,47 @@
 
 #include "Arduino.h"
 #include "Mbus.h"
+#include "SoftwareSerial.h"
 
-Mbus::Mbus()
+int PACKET_TIMEOUT = 500;
+SoftwareSerial serial;
+
+Mbus::Mbus(int busPin)
 {
+    serial(busPin,true);
+    serial.begin(1200);
 }
 
-void Mbus::test()
+boolean Mbus::checksum(byte *packet, int length)
 {
-  delay(250);
+    int sum=0;
+    for(int i=0;i<length-1;i++)
+    {
+        for(int j=0;j<4;j++)
+        {
+            sum+=bitRead(packet[i],j);
+            Serial.print(bitRead(packet[i],j));
+        }
+        Serial.println();
+    }
+    int cs=(sum%2)+1;
+    return cs==packet[length-1];
+}
+
+void Mbus::readPacket()
+{
+    unsigned long startMillis = millis();
+    char packet[8];
+    for(i=0;i<sizeof(packet);i++) packet[i]=null;
+    while(serial.available()||millis()-startMillis<PACKET_TIMEOUT)
+    {
+        if(serial.available())
+        {
+            packet[i]=serial.read();
+            i++;
+        }
+    }
+
+
+
 }

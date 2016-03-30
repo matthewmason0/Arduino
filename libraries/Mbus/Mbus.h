@@ -7,14 +7,17 @@
 #define Mbus_h
 
 #include "Arduino.h"
+#include "SoftwareSerial.h"
 
 class Mbus
 {
   public:
-    Mbus();
-    void test();
+    Mbus(int busPin);
   private:
-    int _pin;
+    int PACKET_TIMEOUT;
+    SoftwareSerial serial;
+    boolean checksum(byte *packet, int length);
+    void readPacket();
 };
 
 #endif
