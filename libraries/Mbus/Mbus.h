@@ -7,9 +7,10 @@
 #define Mbus_h
 
 #include "Arduino.h"
+#include "Nibble.h"
 #include <SoftwareSerial.h>
 
-class Mbus
+class Mbus:Nibble
 {
   public:
     Mbus(int busPin);
