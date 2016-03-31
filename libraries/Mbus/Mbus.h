@@ -7,17 +7,20 @@
 #define Mbus_h
 
 #include "Arduino.h"
-#include "SoftwareSerial.h"
+#include <SoftwareSerial.h>
 
 class Mbus
 {
   public:
     Mbus(int busPin);
   private:
-    int PACKET_TIMEOUT;
-    SoftwareSerial serial;
-    boolean checksum(byte *packet, int length);
-    void readPacket();
+    int PACKET_TIMEOUT;                                     //ms waiting for the remainder of a packet to arrive
+    SoftwareSerial serial;                                  //this instance's serial port, on busPin
+    boolean getNibble(byte fullByte, boolean whichHalf);    //returns a boolean array of nibble 0 (half 0) or nibble 1 (half 1) in a byte
+    boolean decode(boolean *nibble);                        //returns the second bit (bit 1) of a nibble as a boolean
+    boolean checksum(byte *packet, int length);             //returns true if packet and its checksum match
+    void parsePacket(boolean (*packetNibbles)[4],int length);
+    void readPacket();                                      //
 };
 
 #endif

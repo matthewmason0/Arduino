@@ -6,15 +6,37 @@
 
 #include "Arduino.h"
 #include "Mbus.h"
-#include "SoftwareSerial.h"
+#include <SoftwareSerial.h>
+#include <stdlib.h>
 
 int PACKET_TIMEOUT = 500;
-SoftwareSerial serial;
 
-Mbus::Mbus(int busPin)
+Mbus::Mbus(int busPin):serial(busPin,busPin,true)
 {
-    serial(busPin,true);
     serial.begin(1200);
+}
+
+boolean getNibble(byte fullByte, boolean whichHalf)
+{
+    boolean nibble[4];
+    int bit;
+    switch(whichHalf)
+    {
+    case 0:
+        bit=0;
+        break;
+    case 1:
+        bit=4;
+        break;
+    }
+    for(int i=0;i<4;i++,bit++)
+        nibble[i]=bitRead(fullByte,bit);
+    return *nibble;
+}
+
+boolean decode(boolean *nibble)
+{
+    return nibble[1];
 }
 
 boolean Mbus::checksum(byte *packet, int length)
@@ -33,11 +55,18 @@ boolean Mbus::checksum(byte *packet, int length)
     return cs==packet[length-1];
 }
 
+void parsePacket(boolean (*packetNibbles)[4],int length)
+{
+
+}
+
 void Mbus::readPacket()
 {
     unsigned long startMillis = millis();
-    char packet[8];
-    for(i=0;i<sizeof(packet);i++) packet[i]=null;
+    byte packet[30]; //30 bytes long; longest possible packet size is 60 bits, but when encoded is 240 bits (30 bytes) long.
+    for(int i=0;i<sizeof(packet);i++)
+        packet[i]=0;
+    int i=0;
     while(serial.available()||millis()-startMillis<PACKET_TIMEOUT)
     {
         if(serial.available())
@@ -46,7 +75,17 @@ void Mbus::readPacket()
             i++;
         }
     }
-
-
-
+    boolean packetInNibbles[60][4]; //an array of nibbles; 60 nibbles long, 4 bits each
+    int packetSizeInEncodedNibbles=0;
+    for(int i=0;i<60;i++)
+    {
+        packetInNibbles[i]=getNibble(packet[i/2],i%2);
+        if(packet[i]!=0)
+            packetSizeInEncodedNibbles++;
+    }
+    boolean packetInNibblesTrimmed[packetSizeInEncodedNibbles][4];
+    for(int i=0;i<packetSizeInEncodedNibbles;i++)
+        for(int j=0;j<4;j++)
+            packetInNibblesTrimmed[i][j]=packetInNibbles[i][j];
+    parsePacket(packetInNibblesTrimmed,packetSizeInEncodedNibbles);
 }
