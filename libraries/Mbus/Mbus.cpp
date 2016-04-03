@@ -1,5 +1,5 @@
 /*
-  Mbus.h - Library for interfacing with Mbus CD Changer Devices.
+  Mbus.cpp - Library for interfacing with Mbus CD Changer Devices.
   Created by Matthew Mason, March 29, 2016.
   !(Released into the public domain.)
 */
