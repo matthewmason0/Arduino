@@ -15,6 +15,7 @@ boolean bitRead(int bit)
      return bits[bit];
 }
 
-void bitWrite(int bit)
+void bitWrite(int bit, boolean value)
 {
-     bits[bit]=
+     bits[bit]=value;
+}
