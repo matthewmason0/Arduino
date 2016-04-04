@@ -13,7 +13,7 @@ class Nibble:Nibble
 {
   public:
     boolean bitRead(int bit);
-    boolean bitWrite(int bit, int value);
+    void bitWrite(int bit, int value);
   private:
     boolean bits[4];
 };
