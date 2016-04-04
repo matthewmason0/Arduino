@@ -6,6 +6,7 @@
 
 #include "Arduino.h"
 #include "Mbus.h"
+#include <Nibble.h>
 #include <SoftwareSerial.h>
 #include <stdlib.h>
 
@@ -16,9 +17,9 @@ Mbus::Mbus(int busPin):serial(busPin,busPin,true)
     serial.begin(1200);
 }
 
-boolean getNibble(byte fullByte, boolean whichHalf)
+Nibble getNibble(byte fullByte, boolean whichHalf)
 {
-    boolean nibble[4];
+    Nibble nibble;
     int bit;
     switch(whichHalf)
     {
@@ -30,13 +31,13 @@ boolean getNibble(byte fullByte, boolean whichHalf)
         break;
     }
     for(int i=0;i<4;i++,bit++)
-        nibble[i]=bitRead(fullByte,bit);
+        nibble.bitWrite(i,bitRead(fullByte,bit));
     return *nibble;
 }
 
-boolean decode(boolean *nibble)
+boolean decode(Nibble *nibble)
 {
-    return nibble[1];
+    return nibble.bitRead(1);
 }
 
 boolean Mbus::checksum(byte *packet, int length)
@@ -55,7 +56,7 @@ boolean Mbus::checksum(byte *packet, int length)
     return cs==packet[length-1];
 }
 
-void parsePacket(boolean (*packetNibbles)[4],int length)
+void parsePacket(Nibble *packetNibbles,int length)
 {
 
 }
@@ -83,9 +84,9 @@ void Mbus::readPacket()
         if(packet[i]!=0)
             packetSizeInEncodedNibbles++;
     }
-    boolean packetInNibblesTrimmed[packetSizeInEncodedNibbles][4];
+    Nibble packetInNibblesTrimmed[packetSizeInEncodedNibbles];
     for(int i=0;i<packetSizeInEncodedNibbles;i++)
         for(int j=0;j<4;j++)
-            packetInNibblesTrimmed[i][j]=packetInNibbles[i][j];
+            packetInNibblesTrimmed[i].bitWrite(j,packetInNibbles[i][j]);
     parsePacket(packetInNibblesTrimmed,packetSizeInEncodedNibbles);
 }
