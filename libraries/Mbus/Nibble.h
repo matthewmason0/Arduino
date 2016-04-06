@@ -4,16 +4,16 @@
   !(Released into the public domain.)
 */
 
-#ifndef Mbus_h
-#define Mbus_h
+#ifndef Nibble_h
+#define Nibble_h
 
-#include "Arduino.h"
+//#include "Arduino.h"
 
-class Nibble:Nibble
+class Nibble
 {
   public:
-    boolean bitRead(int bit);
-    void bitWrite(int bit, int value);
+    boolean Nibble::bitRead(int bit);
+    void Nibble::bitWrite(int bit, int value);
   private:
     boolean bits[4];
 };

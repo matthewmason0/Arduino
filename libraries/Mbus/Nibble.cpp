@@ -6,10 +6,6 @@
 
 boolean bits[4];
 
-Nibble:Nibble()
-{
-}
-
 boolean bitRead(int bit)
 {
      return bits[bit];
