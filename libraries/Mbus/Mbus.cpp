@@ -31,13 +31,13 @@ Nibble getNibble(byte fullByte, boolean whichHalf)
         break;
     }
     for(int i=0;i<4;i++,bit++)
-        nibble.bitWrite(i,bitRead(fullByte,bit));
-    return *nibble;
+        nibble.setBit(i,bitRead(fullByte,bit));
+    return nibble;
 }
 
-boolean decode(Nibble *nibble)
+boolean decode(Nibble nibble)
 {
-    return nibble.bitRead(1);
+    return nibble.getBit(1);
 }
 
 boolean Mbus::checksum(byte *packet, int length)
@@ -76,17 +76,16 @@ void Mbus::readPacket()
             i++;
         }
     }
-    boolean packetInNibbles[60][4]; //an array of nibbles; 60 nibbles long, 4 bits each
+    Nibble packetInNibbles[60]; //an array of nibbles; 60 nibbles long, 4 bits each
     int packetSizeInEncodedNibbles=0;
     for(int i=0;i<60;i++)
     {
         packetInNibbles[i]=getNibble(packet[i/2],i%2);
-        if(packet[i]!=0)
+        if(!packetInNibbles[i].isEmpty())
             packetSizeInEncodedNibbles++;
     }
     Nibble packetInNibblesTrimmed[packetSizeInEncodedNibbles];
     for(int i=0;i<packetSizeInEncodedNibbles;i++)
-        for(int j=0;j<4;j++)
-            packetInNibblesTrimmed[i].bitWrite(j,packetInNibbles[i][j]);
+            packetInNibblesTrimmed[i]=packetInNibbles[i];
     parsePacket(packetInNibblesTrimmed,packetSizeInEncodedNibbles);
 }

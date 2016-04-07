@@ -7,13 +7,14 @@
 #ifndef Nibble_h
 #define Nibble_h
 
-//#include "Arduino.h"
+#include "Arduino.h"
 
 class Nibble
 {
   public:
-    boolean Nibble::bitRead(int bit);
-    void Nibble::bitWrite(int bit, int value);
+    boolean getBit(int bit);
+    void setBit(int bit, int value);
+    boolean isEmpty();
   private:
     boolean bits[4];
 };
