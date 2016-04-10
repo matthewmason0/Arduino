@@ -56,12 +56,17 @@ boolean Mbus::checksum(Nibble *packet, int length)
     return cs==packet[length-1];
 }
 
-void parsePacket(Nibble *packet,int length)
+String parsePacket(Nibble *packet,int length)
 {
-
+    String str;
+    for(int i=0;i<length;i++)
+    {
+        str += packet[i].toString();
+    }
+    return str;
 }
 
-void Mbus::readPacket()
+String Mbus::readPacket()
 {
     unsigned long startMillis = millis();
     byte packet[30]; //30 bytes long; longest possible packet size is 60 bits, but when encoded is 240 bits (30 bytes) long.
@@ -87,5 +92,5 @@ void Mbus::readPacket()
     Nibble packetInNibblesTrimmed[packetSizeTrimmed];
     for(int i=0;i<packetSizeTrimmed;i++)
             packetInNibblesTrimmed[i]=packetInNibbles[i];
-    parsePacket(packetInNibblesTrimmed,packetSizeTrimmed);
+    return parsePacket(packetInNibblesTrimmed,packetSizeTrimmed);
 }
