@@ -20,8 +20,8 @@ class Mbus
     SoftwareSerial serial;                                  //this instance's serial port, on busPin
     Nibble getNibble(byte fullByte, boolean whichHalf);    //returns a boolean array of nibble 0 (half 0) or nibble 1 (half 1) in a byte
     boolean decode(Nibble *nibble);                        //returns the second bit (bit 1) of a nibble as a boolean
-    boolean checksum(byte *packet, int length);             //returns true if packet and its checksum match
-    void parsePacket(Nibble *packetNibbles,int length);
+    boolean checksum(Nibble *packet, int length);             //returns true if packet and its checksum match
+    void parsePacket(Nibble *packet ,int length);
     void readPacket();                                      //
 };
 
