@@ -77,15 +77,15 @@ void Mbus::readPacket()
         }
     }
     Nibble packetInNibbles[60]; //an array of nibbles; 60 nibbles long, 4 bits each
-    int packetSizeInEncodedNibbles=0;
+    int packetSizeTrimmed=0;
     for(int i=0;i<60;i++)
     {
         packetInNibbles[i]=getNibble(packet[i/2],i%2);
         if(!packetInNibbles[i].isEmpty())
-            packetSizeInEncodedNibbles++;
+            packetSizeTrimmed++;
     }
-    Nibble packetInNibblesTrimmed[packetSizeInEncodedNibbles];
-    for(int i=0;i<packetSizeInEncodedNibbles;i++)
+    Nibble packetInNibblesTrimmed[packetSizeTrimmed];
+    for(int i=0;i<packetSizeTrimmed;i++)
             packetInNibblesTrimmed[i]=packetInNibbles[i];
-    parsePacket(packetInNibblesTrimmed,packetSizeInEncodedNibbles);
+    parsePacket(packetInNibblesTrimmed,packetSizeTrimmed);
 }
