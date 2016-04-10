@@ -60,9 +60,7 @@ String parsePacket(Nibble *packet,int length)
 {
     String str;
     for(int i=0;i<length;i++)
-    {
         str += packet[i].toString();
-    }
     return str;
 }
 
@@ -92,5 +90,10 @@ String Mbus::readPacket()
     Nibble packetInNibblesTrimmed[packetSizeTrimmed];
     for(int i=0;i<packetSizeTrimmed;i++)
             packetInNibblesTrimmed[i]=packetInNibbles[i];
-    return parsePacket(packetInNibblesTrimmed,packetSizeTrimmed);
+    int packetSizeDecoded=packetSizeTrimmed/4;
+    Nibble packetInNibblesDecoded[packetSizeDecoded];
+    for(int i=0;i<packetSizeDecoded;i++)
+        for(int j=0;j<4;j++)
+            packetInNibblesDecoded[i].setBit(j,decode(packetInNibblesTrimmed[i*4+j]));
+    return parsePacket(packetInNibblesDecoded,packetSizeDecoded);
 }

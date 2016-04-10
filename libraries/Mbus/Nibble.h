@@ -15,6 +15,7 @@ class Nibble
     boolean getBit(int bit);
     void setBit(int bit, int value);
     boolean isEmpty();
+    String toString();
   private:
     boolean bits[4];
 };

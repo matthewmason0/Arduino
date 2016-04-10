@@ -21,3 +21,12 @@ boolean isEmpty()
 {
     return !(bits[0]||bits[1]||bits[2]||bits[3]);
 }
+
+String toString()
+{
+    byte val=0;
+    for(int i=0;i<4;i++)
+        bitWrite(val,i,bits[i]);
+    String str = String(val, HEX);
+    return str.substring(1);
+}
