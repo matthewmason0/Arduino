@@ -17,6 +17,14 @@ void setBit(int bit, boolean value)
      bits[bit]=value;
 }
 
+byte toByte()
+{
+    byte val=0;
+    for(int i=0;i<4;i++)
+        bitWrite(val,i,bits[i]);
+    return val;
+}
+
 boolean isEmpty()
 {
     return !(bits[0]||bits[1]||bits[2]||bits[3]);
@@ -24,9 +32,11 @@ boolean isEmpty()
 
 String toString()
 {
-    byte val=0;
-    for(int i=0;i<4;i++)
-        bitWrite(val,i,bits[i]);
-    String str = String(val, HEX);
+    String str = String(toByte(), HEX);
     return str.substring(1);
+}
+
+boolean equals(int value)
+{
+    return (int)toByte()==value;
 }

@@ -17,7 +17,7 @@ Mbus::Mbus(int busPin):serial(busPin,busPin,true)
     serial.begin(1200);
 }
 
-Nibble getNibble(byte fullByte, boolean whichHalf)
+Nibble Mbus::getNibble(byte fullByte, boolean whichHalf)
 {
     Nibble nibble;
     int bit;
@@ -35,7 +35,7 @@ Nibble getNibble(byte fullByte, boolean whichHalf)
     return nibble;
 }
 
-boolean decode(Nibble nibble)
+boolean Mbus::decode(Nibble nibble)
 {
     return nibble.getBit(1);
 }
@@ -53,15 +53,19 @@ boolean Mbus::checksum(Nibble *packet, int length)
         Serial.println();
     }
     int cs=(sum%2)+1;
-    return cs==packet[length-1];
+    return packet[length-1].equals(cs);
 }
 
-String parsePacket(Nibble *packet,int length)
+String Mbus::parsePacket(Nibble *packet, int length)
 {
-    String str;
-    for(int i=0;i<length;i++)
-        str += packet[i].toString();
-    return str;
+    if(checksum(packet,length))
+    {
+        String str;
+        for(int i=0;i<length-1;i++) //last nibble is the checksum - don't need that
+            str += packet[i].toString();
+        return str;
+    }
+    return "";
 }
 
 String Mbus::readPacket()

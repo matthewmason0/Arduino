@@ -16,8 +16,10 @@ class Nibble
     void setBit(int bit, int value);
     boolean isEmpty();
     String toString();
+    boolean equals(int value);
   private:
     boolean bits[4];
+    byte toByte();
 };
 
 #endif
