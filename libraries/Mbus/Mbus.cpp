@@ -40,15 +40,15 @@ boolean decode(Nibble nibble)
     return nibble.getBit(1);
 }
 
-boolean Mbus::checksum(byte *packet, int length)
+boolean Mbus::checksum(Nibble *packet, int length)
 {
     int sum=0;
     for(int i=0;i<length-1;i++)
     {
         for(int j=0;j<4;j++)
         {
-            sum+=bitRead(packet[i],j);
-            Serial.print(bitRead(packet[i],j));
+            sum+=packet[i].getBit(j);
+            Serial.print(packet[i].getBit(j));
         }
         Serial.println();
     }
@@ -56,7 +56,7 @@ boolean Mbus::checksum(byte *packet, int length)
     return cs==packet[length-1];
 }
 
-void parsePacket(Nibble *packetNibbles,int length)
+void parsePacket(Nibble *packet,int length)
 {
 
 }
