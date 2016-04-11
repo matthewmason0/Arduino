@@ -74,15 +74,27 @@ String Mbus::readPacket()
     byte packet[30]; //30 bytes long; longest possible packet size is 60 bits, but when encoded is 240 bits (30 bytes) long.
     for(int i=0;i<sizeof(packet);i++)
         packet[i]=0;
-    int i=0;
-    while(serial.available()||millis()-startMillis<PACKET_TIMEOUT)
-    {
-        if(serial.available())
-        {
-            packet[i]=serial.read();
-            i++;
-        }
-    }
+    packet[0]=
+    packet[1]=
+    packet[2]=
+    packet[3]=
+    packet[4]=
+    packet[5]=
+    packet[6]=
+    packet[7]=
+    packet[8]=
+    packet[9]=
+    packet[10]=
+    packet[11]=
+    //int i=0;
+    //while(serial.available()||millis()-startMillis<PACKET_TIMEOUT)
+    //{
+    //    if(serial.available())
+    //    {
+    //        packet[i]=serial.read();
+    //        i++;
+    //    }
+    //}
     Nibble packetInNibbles[60]; //an array of nibbles; 60 nibbles long, 4 bits each
     int packetSizeTrimmed=0;
     for(int i=0;i<60;i++)
