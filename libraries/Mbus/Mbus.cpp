@@ -74,18 +74,18 @@ String Mbus::readPacket()
     byte packet[30]; //30 bytes long; longest possible packet size is 60 bits, but when encoded is 240 bits (30 bytes) long.
     for(int i=0;i<sizeof(packet);i++)
         packet[i]=0;
-    packet[0]=
-    packet[1]=
-    packet[2]=
-    packet[3]=
-    packet[4]=
-    packet[5]=
-    packet[6]=
-    packet[7]=
-    packet[8]=
-    packet[9]=
-    packet[10]=
-    packet[11]=
+    packet[0]=B00110011;
+    packet[1]=B00110111;
+    packet[2]=B00110011;
+    packet[3]=B00110111;
+    packet[4]=B00110011;
+    packet[5]=B00110111;
+    packet[6]=B00110011;
+    packet[7]=B00110111;
+    packet[8]=B00110011;
+    packet[9]=B00110111;
+    packet[10]=B00110011;
+    packet[11]=B01110011;
     //int i=0;
     //while(serial.available()||millis()-startMillis<PACKET_TIMEOUT)
     //{
