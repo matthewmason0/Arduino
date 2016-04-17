@@ -123,7 +123,7 @@ void Mbus::readPacketTest()
         {
             if(serial.available())
             {
-                Serial.println(serial.read());
+                Serial.println(serial.read(), BIN);
             }
         }
     }
