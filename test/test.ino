@@ -6,10 +6,9 @@ void setup()
 {
   Serial.begin(9600);
   pinMode(13,OUTPUT);
-  int length = sizeof(array);
-  Serial.println(length);
-  
+  digitalWrite(13,LOW);
 }
 void loop()
 {
+  bus.readPacketTest();
 }
