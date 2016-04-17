@@ -114,19 +114,17 @@ String Mbus::readPacket()
     return parsePacket(packetInNibblesDecoded,packetSizeDecoded);
 }
 
-String Mbus::readPacketTest()
+void Mbus::readPacketTest()
 {
-    unsigned long startMillis = millis();
-    byte packet[30]; //30 bytes long; longest possible packet size is 60 bits, but when encoded is 240 bits (30 bytes) long.
-    for(int i=0;i<sizeof(packet);i++)
-        packet[i]=0;
-    int i=0;
-    while(serial.available()||millis()-startMillis<PACKET_TIMEOUT)
+    while(true)
     {
-        if(serial.available())
+        unsigned long startMillis = millis();
+        while(serial.available()||millis()-startMillis<PACKET_TIMEOUT)
         {
-            packet[i]=serial.read();
-            i++;
+            if(serial.available())
+            {
+                Serial.println(serial.read());
+            }
         }
     }
 }
