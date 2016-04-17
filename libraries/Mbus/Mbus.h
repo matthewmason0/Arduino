@@ -16,6 +16,7 @@ class Mbus
   public:
     Mbus(int busPin);
     String readPacket();                                    //returns the hex value of the next packet as a string
+    void readPacketTest();
   private:
     int PACKET_TIMEOUT;                                     //ms waiting for the remainder of a packet to arrive
     SoftwareSerial serial;                                  //this instance's serial port, on busPin
