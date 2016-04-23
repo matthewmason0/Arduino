@@ -132,8 +132,8 @@ void Mbus::readPacketTest()
             }
         }
         for(int i=0;i<sizeof(packet);i++)
-        {
-            Serial.println(packet[i], BIN);
-        }
+            for(int j=0;j<8;j++)
+                Serial.print(bitRead(packet[i],j));
+        Serial.println();
     }
 }
