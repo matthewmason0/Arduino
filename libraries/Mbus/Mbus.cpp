@@ -128,12 +128,16 @@ void Mbus::readPacketTest()
             if(serial.available())
             {
                 packet[i]=serial.read();
+                for(int j=0;j<8;j++)
+                    Serial.print(bitRead(packet[i],j));
                 i++;
+                Serial.println();
             }
         }
-        for(int i=0;i<sizeof(packet);i++)
-            for(int j=0;j<8;j++)
-                Serial.print(bitRead(packet[i],j));
-        Serial.println();
+        if(i!=0)
+        {
+            Serial.println("-end of packet-");
+            Serial.println();
+        }
     }
 }
