@@ -7,12 +7,12 @@
 #include "Arduino.h"
 #include "Mbus.h"
 #include <Nibble.h>
-#include <SoftwareSerial.h>
+#include <SoftwareSerialWithHalfDuplex.h>
 #include <stdlib.h>
 
 int PACKET_TIMEOUT = 500;
 
-Mbus::Mbus(int busPin):serial(busPin,busPin,true)
+Mbus::Mbus(int busPin):serial(busPin,busPin,true,false)
 {
     serial.begin(1200);
 }
@@ -120,14 +120,19 @@ void Mbus::readPacketTest()
     {
         unsigned long startMillis = millis();
         byte packet[30]; //30 bytes long; longest possible packet size is 60 bits, but when encoded is 240 bits (30 bytes) long.
+        byte target[] = {B00000100, B10111011, B00100010, B10001011, B00000001, B00000000};
+        byte imThere[] = {B00010001, B00010111, B01000100, B10110001, B00000000};
+        bool reply = true;
         for(int i=0;i<sizeof(packet);i++)
             packet[i]=0;
         int i=0;
-        while(serial.available()||millis()-startMillis<PACKET_TIMEOUT)
+        while(serial.available())//||millis()-startMillis<PACKET_TIMEOUT)
         {
             if(serial.available())
             {
                 packet[i]=serial.read();
+                if((i<sizeof(target)-1) && packet[i]!=target[i])
+                    reply = false;
                 for(int j=0;j<8;j++)
                     Serial.print(bitRead(packet[i],j));
                 i++;
@@ -136,6 +141,14 @@ void Mbus::readPacketTest()
         }
         if(i!=0)
         {
+            if(true)
+            {
+                serial.write(imThere,5);
+                Serial.println();
+                for(int i=0;i<sizeof(imThere);i++)
+                    Serial.println(imThere[i]);
+                Serial.println("replied");
+            }
             Serial.println("-end of packet-");
             Serial.println();
         }

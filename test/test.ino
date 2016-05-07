@@ -1,4 +1,4 @@
-#include <SoftwareSerial.h>
+#include <SoftwareSerialWithHalfDuplex.h>
 #include <Mbus.h>
 Mbus bus(3);
 byte array[]={B00000001,B00001110,B00001111,B00000001};
