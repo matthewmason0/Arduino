@@ -131,9 +131,9 @@ void Mbus::readPacketTest()
             if(serial.available())
             {
                 packet[i]=serial.read();
-                if((i<sizeof(target)-1) && packet[i]!=target[i])
-                    reply = false;
-                for(int j=0;j<8;j++)
+                //if((i<sizeof(target)-1) && packet[i]!=target[i])
+                //    reply = false;
+                for(int j=7;j>=0;j--)//prints: msb------lsb \n
                     Serial.print(bitRead(packet[i],j));
                 i++;
                 Serial.println();
@@ -141,7 +141,7 @@ void Mbus::readPacketTest()
         }
         if(i!=0)
         {
-            if(true)
+            if(false)//(reply)
             {
                 serial.write(imThere,5);
                 Serial.println();
@@ -149,7 +149,9 @@ void Mbus::readPacketTest()
                     Serial.println(imThere[i]);
                 Serial.println("replied");
             }
-            Serial.println("-end of packet-");
+            Serial.print("-end of packet, ");
+            Serial.print(millis()-startMillis);
+            Serial.println(" ms-");
             Serial.println();
         }
     }
