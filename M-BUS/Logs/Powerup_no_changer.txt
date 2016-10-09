@@ -1,0 +1,8 @@
+Powerup without changer
+
+04996 R: 114000005           Repeat Off
+02013 R: 18A                 Ping
+02044 R: 18A                 Ping
+02032 R: 18A                 Ping
+02025 R: 18A                 Ping
+02012 R: 18A                 Ping

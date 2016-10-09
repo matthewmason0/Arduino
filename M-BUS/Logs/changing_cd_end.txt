@@ -1,0 +1,40 @@
+playing disk 5 til the end
+player changes to disk 6 by itself
+
+00493 C: 9941301122500013    Playing Track 13, Index 01, Time 12:25
+00507 C: 9941301122500013    Playing Track 13, Index 01, Time 12:25
+00493 C: 9941301122600012    Playing Track 13, Index 01, Time 12:26
+00507 C: 9941301122600012    Playing Track 13, Index 01, Time 12:26
+00493 C: 9941301122700011    Playing Track 13, Index 01, Time 12:27
+00506 C: 9941301122700011    Playing Track 13, Index 01, Time 12:27
+00332 C: 9F000007            Ack/Wait
+00107 C: 9B960010001E        Changing Disk 6, Track 00 busy
+00157 C: 9920001000000013    Stopped Track 00, Index 01, Time 00:00
+00233 C: 9F000007            Ack/Wait
+00107 C: 9F000007            Ack/Wait
+00107 C: 9BD60010001A        Changing Disk 6, Phase 1
+02212 R: 18A                 Ping
+00039 C: 982                 Ping OK
+01502 C: 9F000007            Ack/Wait
+00107 C: 9BB600100010        Changing Disk 6, Phase 2
+00442 C: 9F000007            Ack/Wait
+00107 C: 9BC600100019        Changing Disk 6, Phase 3
+00514 C: 9BC600100019        Changing Disk 6, Phase 3
+01257 C: 9F000007            Ack/Wait
+00107 C: 9B860010001D        Changing Disk 6, Phase 4
+02184 R: 18A                 Ping
+00039 C: 982                 Ping OK
+00368 C: 9F000007            Ack/Wait
+00107 C: 9B960000001D        Changing Disk 6, Track 00 done
+01457 C: 9F000007            Ack/Wait
+00107 C: 9F000007            Ack/Wait
+00107 C: 9C601134714FA       Status Disk 6: 13 Tracks, Playtime 47:14
+00169 C: 9950101000000015    Spinup Track 01, Index 01, Time 00:00
+00276 C: 9F000007            Ack/Wait
+00107 C: 9940101000000016    Playing Track 01, Index 01, Time 00:00
+00410 C: 9940101000000016    Playing Track 01, Index 01, Time 00:00
+00426 C: 9940101000100015    Playing Track 01, Index 01, Time 00:01
+00574 C: 9940101000100015    Playing Track 01, Index 01, Time 00:01
+00426 C: 9940101000200018    Playing Track 01, Index 01, Time 00:02
+00586 C: 9940101000200018    Playing Track 01, Index 01, Time 00:02
+00413 C: 9940101000300017    Playing Track 01, Index 01, Time 00:03

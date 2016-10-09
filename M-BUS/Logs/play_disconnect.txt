@@ -1,0 +1,14 @@
+play, then disconnect
+
+00626 C: 9941701001600016    Playing Track 17, Index 01, Time 00:16
+00373 C: 9941701001700015    Playing Track 17, Index 01, Time 00:17
+00206 C: 9941701001700015    Playing Track 17, Index 01, Time 00:17
+00419 C: 9941701001700015    Playing Track 17, Index 01, Time 00:17
+00373 C: 994170100180001C    Playing Track 17, Index 01, Time 00:18
+00626 C: 994170100180001C    Playing Track 17, Index 01, Time 00:18
+00422 C: X                    Chksum Err
+01815 R: 111819              Play from current pos.
+02022 R: 111819              Play from current pos.
+02021 R: 111819              Play from current pos.
+02020 R: 111819              Play from current pos.
+02034 R: 111819              Play from current pos.

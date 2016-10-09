@@ -1,0 +1,154 @@
+-1068 ms-
+-begin packet-
+00000100
+-end packet, 1 ms-
+-2 ms-
+-begin packet-
+00010111
+11000100
+00001100
+00010001
+00010111
+01000100
+01001100
+-end packet, 86 ms-
+-1950 ms-
+-begin packet-
+00000100
+-end packet, 1 ms-
+-2 ms-
+-begin packet-
+00010111
+11000100
+00001100
+00010001
+00010111
+01000100
+01001100
+-end packet, 84 ms-
+-1940 ms-
+-begin packet-
+00000100
+-end packet, 1 ms-
+-2 ms-
+-begin packet-
+00010111
+11000100
+00001100
+00010001
+00010111
+01000100
+01001100
+-end packet, 84 ms-
+-1950 ms-
+-begin packet-
+00000100
+-end packet, 1 ms-
+-2 ms-
+-begin packet-
+00010111
+11000100
+00001100
+00010001
+00010111
+01000100
+01001100
+-end packet, 83 ms-
+-1951 ms-
+-begin packet-
+00000100
+-end packet, 0 ms-
+-2 ms-
+-begin packet-
+00010111
+11000100
+00001100
+00010001
+00010111
+01000100
+01001100
+-end packet, 83 ms-
+-1949 ms-
+-begin packet-
+00000100
+-end packet, 1 ms-
+-3 ms-
+-begin packet-
+00010111
+11000100
+00001100
+00010001
+00010111
+01000100
+01001100
+-end packet, 86 ms-
+-1939 ms-
+-begin packet-
+00000100
+-end packet, 1 ms-
+-3 ms-
+-begin packet-
+00010111
+11000100
+00001100
+00010001
+00010111
+01000100
+01001100
+-end packet, 85 ms-
+-1951 ms-
+-begin packet-
+00000100
+-end packet, 1 ms-
+-2 ms-
+-begin packet-
+00010111
+11000100
+00001100
+00010001
+00010111
+01000100
+01001100
+-end packet, 86 ms-
+-1950 ms-
+-begin packet-
+00000100
+-end packet, 1 ms-
+-2 ms-
+-begin packet-
+00010111
+11000100
+00001100
+00010001
+00010111
+01000100
+01001100
+-end packet, 84 ms-
+-1950 ms-
+-begin packet-
+00000100
+-end packet, 1 ms-
+-3 ms-
+-begin packet-
+00010111
+11000100
+00001100
+00010001
+00010111
+01000100
+01001100
+-end packet, 87 ms-
+-1949 ms-
+-begin packet-
+00000100
+-end packet, 1 ms-
+-2 ms-
+-begin packet-
+00010111
+11000100
+00001100
+00010001
+00010111
+01000100
+01001100
+-end packet, 84 ms-

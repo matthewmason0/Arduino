@@ -1,0 +1,51 @@
+play, scan on (for 2 tracks), then off
+
+00793 C: 9942301001500012    Playing Track 23, Index 01, Time 00:15
+00206 C: 9942301001600013    Playing Track 23, Index 01, Time 00:16
+00793 C: 9942301001600013    Playing Track 23, Index 01, Time 00:16
+00206 C: 9942301001700014    Playing Track 23, Index 01, Time 00:17
+00793 C: 9942301001700014    Playing Track 23, Index 01, Time 00:17
+00206 C: 994230100180001D    Playing Track 23, Index 01, Time 00:18
+00211 R: 11408000D           Scan
+00117 C: 9942301001808015    Playing Track 23, Index 01, Time 00:18
+00206 C: 9F000007            Ack/Wait
+00107 C: 995240100000801C    Spinup Track 24, Index 01, Time 00:00
+00206 C: 9F000007            Ack/Wait
+00107 C: 994240100000801B    Playing Track 24, Index 01, Time 00:00
+00571 C: 994240100000801B    Playing Track 24, Index 01, Time 00:00
+00207 C: 994240100010801C    Playing Track 24, Index 01, Time 00:01
+00792 C: 994240100010801C    Playing Track 24, Index 01, Time 00:01
+00206 C: 9942401000208019    Playing Track 24, Index 01, Time 00:02
+00793 C: 9942401000208019    Playing Track 24, Index 01, Time 00:02
+00206 C: 994240100030801A    Playing Track 24, Index 01, Time 00:03
+00793 C: 994240100030801A    Playing Track 24, Index 01, Time 00:03
+00206 C: 994240100040801F    Playing Track 24, Index 01, Time 00:04
+00793 C: 994240100040801F    Playing Track 24, Index 01, Time 00:04
+00206 C: 9942401000508010    Playing Track 24, Index 01, Time 00:05
+00793 C: 9942401000508010    Playing Track 24, Index 01, Time 00:05
+00206 C: 994240100060801D    Playing Track 24, Index 01, Time 00:06
+00793 C: 994240100060801D    Playing Track 24, Index 01, Time 00:06
+00207 C: 994240100070801E    Playing Track 24, Index 01, Time 00:07
+00792 C: 994240100070801E    Playing Track 24, Index 01, Time 00:07
+00206 C: 9942401000808013    Playing Track 24, Index 01, Time 00:08
+00793 C: 9942401000808013    Playing Track 24, Index 01, Time 00:08
+00206 C: 9942401000908014    Playing Track 24, Index 01, Time 00:09
+00792 C: 9942401000908014    Playing Track 24, Index 01, Time 00:09
+00207 C: 994240100100801C    Playing Track 24, Index 01, Time 00:10
+00793 C: 994240100100801C    Playing Track 24, Index 01, Time 00:10
+00206 C: 9F000007            Ack/Wait
+00107 C: 995250100000801B    Spinup Track 25, Index 01, Time 00:00
+00206 C: 9F000007            Ack/Wait
+00107 C: 994250100000801C    Playing Track 25, Index 01, Time 00:00
+00699 C: 994250100010801B    Playing Track 25, Index 01, Time 00:01
+01000 C: 994250100020801A    Playing Track 25, Index 01, Time 00:02
+00999 C: 9942501000308019    Playing Track 25, Index 01, Time 00:03
+01001 C: 9942501000408010    Playing Track 25, Index 01, Time 00:04
+00999 C: 994250100050801F    Playing Track 25, Index 01, Time 00:05
+01000 C: 994250100060801E    Playing Track 25, Index 01, Time 00:06
+00999 C: 994250100070801D    Playing Track 25, Index 01, Time 00:07
+00349 R: 114000005           Repeat Off
+00117 C: 9942501000700015    Playing Track 25, Index 01, Time 00:07
+00533 C: 994250100080001C    Playing Track 25, Index 01, Time 00:08
+01000 C: 994250100090001B    Playing Track 25, Index 01, Time 00:09
+01000 C: 9942501001000013    Playing Track 25, Index 01, Time 00:10

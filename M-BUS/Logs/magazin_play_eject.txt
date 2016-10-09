@@ -1,0 +1,32 @@
+ejecting magazin while playing
+
+00999 C: 9942501003000011    Playing Track 25, Index 01, Time 00:30
+01000 C: 9942501003100012    Playing Track 25, Index 01, Time 00:31
+01000 C: 9942501003200013    Playing Track 25, Index 01, Time 00:32
+01000 C: 9942501003300014    Playing Track 25, Index 01, Time 00:33
+00206 C: 9942600000200014    Playing Track 26, Index 00, Time 00:02
+00206 C: 9942600000100011    Playing Track 26, Index 00, Time 00:01
+00586 C: 9942600000100011    Playing Track 26, Index 00, Time 00:01
+00206 C: 9F000007            Ack/Wait
+00107 C: 9B9100800014        Changing Disk 1, Track 00 eject
+00157 C: 9920000000100013    Stopped Track 00, Index 00, Time 00:01
+00206 C: 9F000007            Ack/Wait
+00107 C: 9BD100800018        Changing Disk 1, Phase 1
+02195 C: 9F000007            Ack/Wait
+00103 R: 18A                 Ping
+00040 C: 9F000007            Ack/Wait
+00107 C: 9B8100800013        Changing Disk 1, Phase 4
+00156 C: 982                 Ping OK
+00400 C: 9F000007            Ack/Wait
+00107 C: 9BA100800011        No Magazin Disk 1
+02074 C: 9F000007            Ack/Wait
+00107 C: 9D000000005         some status?
+00144 C: 9BA100200219        No Magazin Disk 1
+00584 R: 114000005           Repeat Off
+00117 C: 9BA10020001B        No Magazin Disk 1
+02205 R: 18A                 Ping
+00039 C: 982                 Ping OK
+02088 R: 18A                 Ping
+00039 C: 982                 Ping OK
+02086 R: 18A                 Ping
+00039 C: 982                 Ping OK

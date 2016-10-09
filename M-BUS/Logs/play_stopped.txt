@@ -1,0 +1,27 @@
+radio, then CD play start
+
+02240 R: 18A                 Ping
+00039 C: 982                 Ping OK
+02043 R: 18A                 Ping
+00039 C: 982                 Ping OK
+02087 R: 18A                 Ping
+00039 C: 982                 Ping OK
+00632 R: 111819              Play from current pos.
+00078 C: 9F000007            Ack/Wait
+00103 R: 111819              Play from current pos.
+00078 C: 9C601134714FA       Status Disk 6: 13 Tracks, Playtime 47:14
+00169 C: 9F000007            Ack/Wait
+00103 R: 111011              Play
+00078 C: 9C601134714FA       Status Disk 6: 13 Tracks, Playtime 47:14
+00169 C: 9A00000000004       some powerup?
+00169 C: 9F000007            Ack/Wait
+00103 R: 111011              Play
+00078 C: 9C601134714FA       Status Disk 6: 13 Tracks, Playtime 47:14
+00169 C: 9D000D69216         some status?
+00144 C: 9F000007            Ack/Wait
+00103 R: 111011              Play
+00078 C: 9B960100001E        Changing Disk 6, Track 01 done
+00157 C: 9940101001400011    Playing Track 01, Index 01, Time 00:14
+00206 C: 9940101001400011    Playing Track 01, Index 01, Time 00:14
+00348 C: 9940101001500012    Playing Track 01, Index 01, Time 00:15
+00559 C: 9940101001500012    Playing Track 01, Index 01, Time 00:15

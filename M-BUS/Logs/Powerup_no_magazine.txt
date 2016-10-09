@@ -1,0 +1,44 @@
+Powerup (last time stopped), no magazin
+
+00040 R: 114000005           Repeat Off
+00115 C: 9F000007            Ack/Wait
+00107 C: 9B8100200091        Changing Disk 1, Phase 4
+00592 C: 9F000007            Ack/Wait
+00107 C: 9BA100200093        No Magazin Disk 1
+01977 C: 9D000000005         some status?
+00144 C: 9F000007            Ack/Wait
+00103 R: 18A                 Ping
+00040 C: 9BA100200291        No Magazin Disk 1
+00156 C: 982                 Ping OK
+00261 R: 114000005           Repeat Off
+00116 C: 9BA100200093        No Magazin Disk 1
+02166 R: 18A                 Ping
+00039 C: 982                 Ping OK
+02061 R: 18A                 Ping
+00039 C: 982                 Ping OK
+
+
+
+last time ejected while playing
+
+59035 R: 114000005           Repeat Off
+00115 C: 9F000007            Ack/Wait
+00103 R: 11182C              Pause from current pos.
+00077 C: 9B8100200019        Changing Disk 1, Phase 4
+00156 C: 9F000007            Ack/Wait
+00107 C: 9C10199000006       Status Disk 1: 99 Tracks, Playtime 00:00
+00169 C: 9A00000000004       some powerup?
+00169 C: 9D000000005         some status?
+00144 C: 9F000007            Ack/Wait
+00107 C: 9BA10020002A        No Magazin Disk 1
+02052 C: 9D000000005         some status?
+00144 C: 9F000007            Ack/Wait
+00103 R: 18A                 Ping
+00040 C: 9BA10020022C        No Magazin Disk 1
+00156 C: 982                 Ping OK
+00057 R: 114000005           Repeat Off
+00116 C: 9BA10020002A        No Magazin Disk 1
+02218 R: 18A                 Ping
+00039 C: 982                 Ping OK
+02092 R: 18A                 Ping
+00039 C: 982                 Ping OK

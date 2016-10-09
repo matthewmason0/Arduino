@@ -1,0 +1,27 @@
+playing, repeat one/all/none cycled
+
+00792 C: 9941301001200016    Playing Track 13, Index 01, Time 00:12
+00206 C: 9941301001200016    Playing Track 13, Index 01, Time 00:12
+00793 C: 9941301001300015    Playing Track 13, Index 01, Time 00:13
+00206 C: 9941301001300015    Playing Track 13, Index 01, Time 00:13
+00793 C: 9941301001400014    Playing Track 13, Index 01, Time 00:14
+00206 C: 9941301001400014    Playing Track 13, Index 01, Time 00:14
+00460 R: 114400001           Repeat One
+00120 C: 9941301001440018    Playing Track 13, Index 01, Time 00:14
+00211 C: 9941301001540017    Playing Track 13, Index 01, Time 00:15
+00206 C: 9941301001540017    Playing Track 13, Index 01, Time 00:15
+00793 C: 9941301001640016    Playing Track 13, Index 01, Time 00:16
+00206 C: 9941301001640016    Playing Track 13, Index 01, Time 00:16
+00200 R: 11480000D           Repeat All
+00117 C: 994130100168001A    Playing Track 13, Index 01, Time 00:16
+00230 R: 11480000D           Repeat All
+00116 C: 994130100168001A    Playing Track 13, Index 01, Time 00:16
+00206 C: 9941301001780019    Playing Track 13, Index 01, Time 00:17
+00921 C: 9941301001880018    Playing Track 13, Index 01, Time 00:18
+00206 C: 9941301001880018    Playing Track 13, Index 01, Time 00:18
+00616 R: 114000005           Repeat Off
+00117 C: 9941301001800010    Playing Track 13, Index 01, Time 00:18
+00206 C: 994130100190001F    Playing Track 13, Index 01, Time 00:19
+00852 C: 9941301002000015    Playing Track 13, Index 01, Time 00:20
+00206 C: 9941301002000015    Playing Track 13, Index 01, Time 00:20
+00793 C: 9941301002100016    Playing Track 13, Index 01, Time 00:21

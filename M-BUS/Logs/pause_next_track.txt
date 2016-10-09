@@ -1,0 +1,27 @@
+paused, then next track twice
+
+00039 C: 982                 Ping OK
+02099 R: 18A                 Ping
+00039 C: 982                 Ping OK
+02079 R: 18A                 Ping
+00039 C: 982                 Ping OK
+00065 R: 113015206           Select CD 0, Track 15
+00115 C: 9B911500002D        Changing Disk 1, Track 15 done
+00924 C: 9F000007            Ack/Wait
+00107 C: 9951501000000023    Spinup Track 15, Index 01, Time 00:00
+00718 C: 9F000007            Ack/Wait
+00107 C: 9931501000000025    Paused Track 15, Index 01, Time 00:00
+02263 R: 18A                 Ping
+00039 C: 982                 Ping OK
+02057 R: 18A                 Ping
+00039 C: 982                 Ping OK
+01880 R: 113016207           Select CD 0, Track 16
+00117 C: 9B9116000020        Changing Disk 1, Track 16 done
+00931 C: 9F000007            Ack/Wait
+00107 C: 9951601000000022    Spinup Track 16, Index 01, Time 00:00
+00493 C: 9F000007            Ack/Wait
+00107 C: 9931601000000028    Paused Track 16, Index 01, Time 00:00
+02233 R: 18A                 Ping
+00039 C: 982                 Ping OK
+02096 R: 18A                 Ping
+00039 C: 982                 Ping OK

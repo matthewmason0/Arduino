@@ -1,0 +1,27 @@
+stopped, magazin eject
+
+02083 R: 18A                 Ping
+00039 C: 982                 Ping OK
+02052 R: 18A                 Ping
+00039 C: 982                 Ping OK
+00217 C: 9B910180009B        Changing Disk 1, Track 01 eject
+00156 C: 9F000007            Ack/Wait
+00107 C: 9BD10180009F        Changing Disk 1, Phase 1
+02184 C: 9F000007            Ack/Wait
+00103 R: 18A                 Ping
+00040 C: 9F000007            Ack/Wait
+00107 C: 9B810180009C        Changing Disk 1, Phase 4
+00156 C: 982                 Ping OK
+00415 C: 9F000007            Ack/Wait
+00107 C: 9BA10180009A        No Magazin Disk 1
+01965 C: 9D000000005         some status?
+00144 C: 9F000007            Ack/Wait
+00103 R: 18A                 Ping
+00040 C: 9BA100200291        No Magazin Disk 1
+00156 C: 982                 Ping OK
+00083 R: 114000005           Repeat Off
+00116 C: 9BA100200093        No Magazin Disk 1
+02227 R: 18A                 Ping
+00039 C: 982                 Ping OK
+02083 R: 18A                 Ping
+00039 C: 982                 Ping OK

@@ -1,0 +1,14 @@
+Power on
+was stopped last time
+
+00016 R: 114000005           Repeat Off
+00115 C: 9B9504000094        Changing Disk 5, Track 04 done
+00157 C: 9920401014900093    Stopped Track 04, Index 01, Time 01:49
+02260 R: 18A                 Ping
+00039 C: 982                 Ping OK
+02106 R: 18A                 Ping
+00039 C: 982                 Ping OK
+02046 R: 18A                 Ping
+00039 C: 982                 Ping OK
+02044 R: 18A                 Ping
+00039 C: 982                 Ping OK

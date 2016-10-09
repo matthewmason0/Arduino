@@ -1,0 +1,50 @@
+playing cd 2, change to disk 4 requested
+not present, player advances to disk 5
+
+01014 C: 9940101000400012    Playing Track 01, Index 01, Time 00:04
+00986 C: 9940101000500011    Playing Track 01, Index 01, Time 00:05
+01014 C: 9940101000600014    Playing Track 01, Index 01, Time 00:06
+00986 C: 9940101000700013    Playing Track 01, Index 01, Time 00:07
+00999 C: 994010100080001E    Playing Track 01, Index 01, Time 00:08
+01013 C: 994010100090001D    Playing Track 01, Index 01, Time 00:09
+01000 C: 9940101001000015    Playing Track 01, Index 01, Time 00:10
+00262 R: 113400107           Select CD 4, Track 00
+00117 C: 9B9400100010        Changing Disk 4, Track 00 busy
+00156 C: 9F000007            Ack/Wait
+00107 C: 9B9400100010        Changing Disk 4, Track 00 busy
+00157 C: 9920001000000013    Stopped Track 00, Index 01, Time 00:00
+00283 C: 9F000007            Ack/Wait
+00107 C: 9F000007            Ack/Wait
+00107 C: 9BD40010001C        Changing Disk 4, Phase 1
+02228 R: 18A                 Ping
+00039 C: 982                 Ping OK
+00271 C: 9F000007            Ack/Wait
+00107 C: 9BB40010001E        Changing Disk 4, Phase 2
+00840 C: 9F000007            Ack/Wait
+00107 C: 9BC40010001B        Changing Disk 4, Phase 3
+00936 C: 9BD400500010        Changing Disk 4, Phase 1
+00156 C: 9F000007            Ack/Wait
+00107 C: 9BD400500010        Changing Disk 4, Phase 1
+00421 C: 9BB50010001D        Changing Disk 5, Phase 2
+00156 C: 9F000007            Ack/Wait
+00107 C: 9BB50010001D        Changing Disk 5, Phase 2
+00272 C: 9F000007            Ack/Wait
+00107 C: 9BC50010001C        Changing Disk 5, Phase 3
+00511 C: 9BC50010001C        Changing Disk 5, Phase 3
+01272 C: 9F000007            Ack/Wait
+00107 C: 9B8500100010        Changing Disk 5, Phase 4
+02215 R: 18A                 Ping
+00040 C: 9F000007            Ack/Wait
+00107 C: 9B9500000010        Changing Disk 5, Track 00 done
+00156 C: 982                 Ping OK
+01420 C: 9F000007            Ack/Wait
+00107 C: 9F000007            Ack/Wait
+00107 C: 9C501137502FD       Status Disk 5: 13 Tracks, Playtime 75:02
+00169 C: 9950101000000015    Spinup Track 01, Index 01, Time 00:00
+00206 C: 9F000007            Ack/Wait
+00107 C: 9940101000000016    Playing Track 01, Index 01, Time 00:00
+00314 C: 9940101000000016    Playing Track 01, Index 01, Time 00:00
+00426 C: 9940101000100015    Playing Track 01, Index 01, Time 00:01
+00573 C: 9940101000100015    Playing Track 01, Index 01, Time 00:01
+00426 C: 9940101000200018    Playing Track 01, Index 01, Time 00:02
+00573 C: 9940101000200018    Playing Track 01, Index 01, Time 00:02

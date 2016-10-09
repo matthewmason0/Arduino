@@ -1,0 +1,24 @@
+Power on
+was paused last time
+
+06283 R: 114000005           Repeat Off
+00115 C: 9F000007            Ack/Wait
+00103 R: 11182C              Pause from current pos.
+00077 C: 9B9504000029        Changing Disk 5, Track 04 done
+00156 C: 9F000007            Ack/Wait
+00107 C: 9C501137502FD       Status Disk 5: 13 Tracks, Playtime 75:02
+00169 C: 9F000007            Ack/Wait
+00107 C: 9C501137502FD       Status Disk 5: 13 Tracks, Playtime 75:02
+00169 C: 9F000007            Ack/Wait
+00107 C: 9A00000000004       some powerup?
+00169 C: 9D000D69216         some status?
+00144 C: 9B9504000029        Changing Disk 5, Track 04 done
+00157 C: 9930401014700027    Paused Track 04, Index 01, Time 01:47
+02251 R: 18A                 Ping
+00039 C: 982                 Ping OK
+02097 R: 18A                 Ping
+00039 C: 982                 Ping OK
+02061 R: 18A                 Ping
+00039 C: 982                 Ping OK
+02105 R: 18A                 Ping
+00039 C: 982                 Ping OK

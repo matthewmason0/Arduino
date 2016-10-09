@@ -1,0 +1,22 @@
+Stopped without magazin, then inserted
+
+02050 R: 18A                 Ping
+00039 C: 982                 Ping OK
+02049 R: 18A                 Ping
+00039 C: 982                 Ping OK
+01613 C: 9BA1001000A3        No Magazin Disk 1
+00156 C: 9F000007            Ack/Wait
+00107 C: 9BB1001000A4        Changing Disk 1, Phase 2
+00674 C: 9F000007            Ack/Wait
+00107 C: 9BC1001000A5        Changing Disk 1, Phase 3
+00538 C: 9BC1001000A5        Changing Disk 1, Phase 3
+01280 C: 9F000007            Ack/Wait
+00107 C: 9B81001000A1        Changing Disk 1, Phase 4
+00719 C: 9F000007            Ack/Wait
+00107 C: 9F000007            Ack/Wait
+00107 C: 9B91000000A1        Changing Disk 1, Track 00 done
+00157 C: 99200010000000AA    Stopped Track 00, Index 01, Time 00:00
+02269 R: 18A                 Ping
+00039 C: 982                 Ping OK
+02049 R: 18A                 Ping
+00039 C: 982                 Ping OK

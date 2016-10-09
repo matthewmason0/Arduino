@@ -1,0 +1,14 @@
+playing, then pause
+
+00206 C: 9941401000300013    Playing Track 14, Index 01, Time 00:03
+00793 C: 9941401000300013    Playing Track 14, Index 01, Time 00:03
+00206 C: 9941401000400016    Playing Track 14, Index 01, Time 00:04
+00792 C: 9941401000400016    Playing Track 14, Index 01, Time 00:04
+00206 C: 9941401000500015    Playing Track 14, Index 01, Time 00:05
+00373 R: 111024              Pause
+00078 C: 9F000007            Ack/Wait
+00107 C: 9931401000500021    Paused Track 14, Index 01, Time 00:05
+02239 R: 18A                 Ping
+00039 C: 982                 Ping OK
+02095 R: 18A                 Ping
+00039 C: 982                 Ping OK

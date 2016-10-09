@@ -1,0 +1,22 @@
+changer not connected, then re-connected
+
+02032 R: 18A                 Ping
+02023 R: 18A                 Ping
+02013 R: 18A                 Ping
+02052 R: 18A                 Ping
+00039 C: 982                 Ping OK
+00048 R: 11182C              Pause from current pos.
+00077 C: 9F000007            Ack/Wait
+00107 C: 9C10199000006       Status Disk 1: 99 Tracks, Playtime 00:00
+00169 C: 9F000007            Ack/Wait
+00107 C: 9A00000000004       some powerup?
+00169 C: 9D000000005         some status?
+00144 C: 9B9100000029        Changing Disk 1, Track 00 done
+00156 C: 9920001000000022    Stopped Track 00, Index 01, Time 00:00
+00364 R: 111406              Stop
+00077 C: 9F000007            Ack/Wait
+00107 C: 99200010000000AA    Stopped Track 00, Index 01, Time 00:00
+02270 R: 18A                 Ping
+00039 C: 982                 Ping OK
+02086 R: 18A                 Ping
+00039 C: 982                 Ping OK

@@ -1,0 +1,37 @@
+play, next track, etc.
+
+00572 C: 9940101002200016    Playing Track 01, Index 01, Time 00:22
+00427 C: 9940101002300015    Playing Track 01, Index 01, Time 00:23
+00573 C: 9940101002300015    Playing Track 01, Index 01, Time 00:23
+00426 C: 9940101002400014    Playing Track 01, Index 01, Time 00:24
+00573 C: 9940101002400014    Playing Track 01, Index 01, Time 00:24
+00201 R: 113002101           Select CD 0, Track 02
+00119 C: 9B950200001E        Changing Disk 5, Track 02 done
+00157 C: 9F000007            Ack/Wait
+00107 C: 9950201000000018    Spinup Track 02, Index 01, Time 00:00
+00519 C: 9F000007            Ack/Wait
+00107 C: 9940201000000017    Playing Track 02, Index 01, Time 00:00
+00837 C: 9940201000000017    Playing Track 02, Index 01, Time 00:00
+00207 C: 9940201000100018    Playing Track 02, Index 01, Time 00:01
+00793 C: 9940201000100018    Playing Track 02, Index 01, Time 00:01
+00206 C: 9940201000200015    Playing Track 02, Index 01, Time 00:02
+00793 C: 9940201000200015    Playing Track 02, Index 01, Time 00:02
+00202 R: 113003102           Select CD 0, Track 03
+00114 C: 9940201000300016    Playing Track 02, Index 01, Time 00:03
+00206 C: 9F000007            Ack/Wait
+00106 C: 9B950300001D        Changing Disk 5, Track 03 done
+00157 C: 9950301000000017    Spinup Track 03, Index 01, Time 00:00
+00536 C: 9F000007            Ack/Wait
+00107 C: 9940301000000018    Playing Track 03, Index 01, Time 00:00
+00797 C: 9940301000100017    Playing Track 03, Index 01, Time 00:01
+00206 C: 9940301000100017    Playing Track 03, Index 01, Time 00:01
+00793 C: 9940301000200016    Playing Track 03, Index 01, Time 00:02
+00207 C: 9940301000200016    Playing Track 03, Index 01, Time 00:02
+00513 R: 113004107           Select CD 0, Track 04
+00120 C: 9F000007            Ack/Wait
+00107 C: 9B950400001C        Changing Disk 5, Track 04 done
+00157 C: 9950401000000012    Spinup Track 04, Index 01, Time 00:00
+00429 C: 9F000007            Ack/Wait
+00107 C: 9940401000000011    Playing Track 04, Index 01, Time 00:00
+00838 C: 9940401000000011    Playing Track 04, Index 01, Time 00:00
+00206 C: 9940401000100012    Playing Track 04, Index 01, Time 00:01

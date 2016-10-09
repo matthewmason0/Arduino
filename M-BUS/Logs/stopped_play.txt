@@ -1,0 +1,31 @@
+stopped, then play
+
+02084 R: 18A                 Ping
+00039 C: 982                 Ping OK
+02047 R: 18A                 Ping
+00039 C: 982                 Ping OK
+00996 R: 111819              Play from current pos.
+00079 C: 9F00007             Ack/Wait
+00084 C: 3X                   Chksum Err
+00019 R: 111819              Play from current pos.
+00078 C: 9F000007            Ack/Wait
+00107 C: 9F000007            Ack/Wait
+00107 C: 9C10199000006       Status Disk 1: 99 Tracks, Playtime 00:00
+00169 C: 9A00000000004       some powerup?
+00164 R: 11?011              ? Chksum Err
+00078 C: 9D000000005         some status?
+00144 C: 9B910000001C        Changing Disk 1, Track 00 done
+00157 C: 9920001000000013    Stopped Track 00, Index 01, Time 00:00
+02278 R: 18A                 Ping
+00040 C: 982                 Ping OK
+01860 C: 9F000007            Ack/Wait
+00107 C: 9F000007            Ack/Wait
+00107 C: 9C101996921F7       Status Disk 1: 99 Tracks, Playtime 69:21
+00169 C: 9D000D69216         some status?
+00144 C: 9950101000000015    Spinup Track 01, Index 01, Time 00:00
+00206 C: 9F000007            Ack/Wait
+00107 C: 9940101000000016    Playing Track 01, Index 01, Time 00:00
+00840 C: 9940101000100015    Playing Track 01, Index 01, Time 00:01
+00999 C: 9940101000200018    Playing Track 01, Index 01, Time 00:02
+01000 C: 9940101000300017    Playing Track 01, Index 01, Time 00:03
+01000 C: 9940101000400012    Playing Track 01, Index 01, Time 00:04
