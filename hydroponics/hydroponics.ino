@@ -18,7 +18,8 @@ int offTime = 20; //minutes
 int onTime = 10;  //minutes
 int pump = 2;
 
-void setup() {
+void setup()
+{
   waitLength = offTime * 60; //time_t is in seconds
   runLength = onTime * 60;   
   
@@ -31,7 +32,8 @@ void setup() {
 //Serial.println("OFF");
 }
 
-void loop() {
+void loop()
+{
   lcd.setCursor(1,0);
   lcd.print("Next");
   lcd.setCursor(0,1);
