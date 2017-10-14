@@ -10,7 +10,7 @@
 #include <Ethernet.h>
 
 byte mac[] = { 0x90, 0xA2, 0xDA, 0x0F, 0x2C, 0x1E }; //physical mac address
-IPAddress ip(10,0,0,20); // ip in lan
+//IPAddress ip(10,0,0,20); // ip in lan
 //byte gateway[] = { 10, 0, 0, 1 }; // internet access via router
 //byte subnet[] = { 255, 255, 255, 0 }; //subnet mask
 EthernetServer server(80); //server port
@@ -26,17 +26,30 @@ float temp;
 
 void setup(){
 
-  pinMode(2, OUTPUT); //pin selected to control
-  //start Ethernet
-  Ethernet.begin(mac, ip);
-  server.begin();
+  pinMode(8, OUTPUT); //pin selected to control
 
   //enable serial data print 
   Serial.begin(9600); 
   Serial.println("servertest1"); // so I can keep track of what is loaded
+  
+  //start Ethernet
+  if(Ethernet.begin(mac)==0){ //ip);
+    Serial.println("DHCP Failed");
+    while(true);
+  }
+  Serial.println(Ethernet.localIP());
+  server.begin();
 }
 
 void loop(){
+  byte result = Ethernet.maintain();
+  if(result==1||result==3){
+    Serial.println("DHCP Failed");
+    while(true);
+  }
+  else if(result==4){ //new IP bound
+    Serial.println(Ethernet.localIP());
+  }
   
   sensorVal = analogRead(A0);
   float voltage = (sensorVal/1024.0) * 5.0;
@@ -136,13 +149,13 @@ void loop(){
           ///////////////////// control arduino pin
           if(readString.indexOf("?on") >0)//checks for on
           {
-            digitalWrite(2, HIGH);    // set pin 4 high
+            digitalWrite(8, HIGH);    // set pin 4 high
             Serial.println("Led On");
             pinState = true;
           }
           else if(readString.indexOf("?off") >0)//checks for off
           {
-            digitalWrite(2, LOW);    // set pin 4 low
+            digitalWrite(8, LOW);    // set pin 4 low
             Serial.println("Led Off");
             pinState = false;
           }
