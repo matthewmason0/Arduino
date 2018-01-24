@@ -139,6 +139,10 @@ void loop()
   
             client.println(F("<h1>Control Panel</h1>"));
             client.println(F("<p>&nbsp;</p>"));
+            client.println(F("<h3>Presets:</h3>"));
+            client.println(F("<h3><a href=\"/?unlockmlon\"><font color=\"#00E600\">Unlock &amp; Main Light On</font></a>")); 
+            client.println(F("&nbsp;&nbsp;&nbsp;"));
+            client.println(F("<a href=\"/? lockalloff\"><font color=\"red\">All Off &amp; Lock</font></a></h3>"));
 
             client.println(F("<h3>Door:</h3>"));
             client.println(F("<h3><a href=\"/?unlock\"><font color=\"#00E600\">Unlock</font></a>")); 
