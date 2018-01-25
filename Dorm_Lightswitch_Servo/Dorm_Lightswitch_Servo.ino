@@ -5,7 +5,20 @@ Servo mloff;
 Servo unlock;
 Servo lock;
 
-void setup() {
+int mlon_range[]   = {0, 170}; //normal, activated
+int mloff_range[]  = {0, 170};
+int unlock_range[] = {0, 170};
+int lock_range[]   = {0, 170};
+
+int activation_time = 1500;
+
+String command = "";
+bool commandAvailable = false;
+
+void setup()
+{
+  command.reserve(200);
+  
   pinMode(13, OUTPUT);
   digitalWrite(13, LOW);
 
@@ -16,12 +29,60 @@ void setup() {
   unlock.attach(5);
   lock.attach(6);
 
-  mlon.write(0);
+  mlon.write(mlon_range[0]);
+  mloff.write(mloff_range[0]);
+  unlock.write(unlock_range[0]);
+  lock.write(lock_range[0]);
 }
 
-void loop() {
-    
+void loop()
+{
+  if (digitalRead(2))
+  {
+    command = "mlon";
+    commandAvailable = true;
   }
   
-  delay(100);
+  if (commandAvailable)
+  {
+    if (command.equals("mlon"))
+    {
+      mlon.write(mlon_range[1]);
+      delay (activation_time);
+      mlon.write(mlon_range[0]);
+    }
+    if (command.equals("mloff"))
+    {
+      mloff.write(mloff_range[1]);
+      delay (activation_time);
+      mloff.write(mloff_range[0]);
+    }
+    if (command.equals("unlock"))
+    {
+      unlock.write(unlock_range[1]);
+      delay (activation_time);
+      unlock.write(unlock_range[0]);
+    }
+    if (command.equals("lock"))
+    {
+      lock.write(lock_range[1]);
+      delay (activation_time);
+      lock.write(lock_range[0]);
+    }
+    command = "";
+    commandAvailable = false;
+  }
+  delay(10);
+}
+
+void serialEvent()
+{
+  while (Serial.available())
+  {
+    char c = (char)Serial.read();
+    command += c;
+    if (c == '\n') {
+      commandAvailable = true;
+    }
+  }
 }
