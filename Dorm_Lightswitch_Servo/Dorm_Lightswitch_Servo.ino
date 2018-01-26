@@ -39,8 +39,10 @@ void loop()
 {
   if (digitalRead(2))
   {
-    command = "mlon";
-    commandAvailable = true;
+    mlon.write(mlon_range[1]);
+    delay(activation_time);
+    mlon.write(mlon_range[0]);
+    delay(60000);
   }
   
   if (commandAvailable)
@@ -48,25 +50,25 @@ void loop()
     if (command.equals("mlon"))
     {
       mlon.write(mlon_range[1]);
-      delay (activation_time);
+      delay(activation_time);
       mlon.write(mlon_range[0]);
     }
     if (command.equals("mloff"))
     {
       mloff.write(mloff_range[1]);
-      delay (activation_time);
+      delay(activation_time);
       mloff.write(mloff_range[0]);
     }
     if (command.equals("unlock"))
     {
       unlock.write(unlock_range[1]);
-      delay (activation_time);
+      delay(activation_time);
       unlock.write(unlock_range[0]);
     }
     if (command.equals("lock"))
     {
       lock.write(lock_range[1]);
-      delay (activation_time);
+      delay(activation_time);
       lock.write(lock_range[0]);
     }
     command = "";
