@@ -83,9 +83,8 @@ void loop()
           int index = readString.indexOf('?');
           if(index >=0)
           { 
-            client.println("HTTP/1.1 204 No Content"); //don't send new page
-            client.println();
-            client.println();
+            client.println("HTTP/1.1 303 See Other"); //stay on the same page
+            client.print("Location: http://"); client.println(Ethernet.localIP());
             
             String command = readString.substring(index+1, readString.length()-11);
                         

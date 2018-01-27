@@ -36,17 +36,10 @@ void setup()
 }
 
 void loop()
-{
-  if (digitalRead(2))
-  {
-    mlon.write(mlon_range[1]);
-    delay(activation_time);
-    mlon.write(mlon_range[0]);
-    delay(60000);
-  }
-  
+{ 
   if (commandAvailable)
   {
+    command.trim();
     if (command.equals("mlon"))
     {
       mlon.write(mlon_range[1]);
