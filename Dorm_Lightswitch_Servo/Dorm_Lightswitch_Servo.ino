@@ -40,6 +40,22 @@ void loop()
   if (commandAvailable)
   {
     command.trim();
+    if (command.equals("unlockmlon"))
+    {
+      unlock.write(unlock_range[1]);
+      mlon.write(mlon_range[1]);
+      delay(activation_time);
+      unlock.write(unlock_range[0]);
+      mlon.write(mlon_range[0]);
+    }
+    if (command.equals("lockmloff"))
+    {
+      lock.write(lock_range[1]);
+      mloff.write(mloff_range[1]);
+      delay(activation_time);
+      lock.write(lock_range[0]);
+      mloff.write(mloff_range[0]);
+    }
     if (command.equals("mlon"))
     {
       mlon.write(mlon_range[1]);
