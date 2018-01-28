@@ -6,8 +6,8 @@ Servo unlock;
 Servo lock;
 
 int mlon_range[]   = {0, 170}; //normal, activated
-int mloff_range[]  = {0, 170};
-int unlock_range[] = {0, 170};
+int mloff_range[]  = {0, 165};
+int unlock_range[] = {160, 0};
 int lock_range[]   = {0, 170};
 
 int activation_time = 1500;
