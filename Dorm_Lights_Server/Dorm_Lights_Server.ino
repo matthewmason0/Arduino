@@ -22,6 +22,8 @@ String tempHum;
 
 void setup()
 {
+  pinMode(5, INPUT); //swSerial RX
+  pinMode(6, OUTPUT); //swSerial TX
   pinMode(8, OUTPUT); //Christmas Lights
   digitalWrite(8, LOW);
   pinMode(3, INPUT); //Alarm
@@ -29,7 +31,7 @@ void setup()
   Serial.begin(9600);
   swSerial.begin(9600);
   
-//  Serial.println("dorm control initializing...");
+  Serial.println("dorm control initializing...");
   
   //start Ethernet
   if(Ethernet.begin(mac)==0)
@@ -40,6 +42,7 @@ void setup()
 //  Serial.print("Acquired IP Address: ");
 //  Serial.println(Ethernet.localIP());
   server.begin();
+  Serial.println("start");
 }
 
 void loop()
@@ -60,16 +63,21 @@ void loop()
     }
   }
 
-  while(swSerial.available())
-  {
-    char c = (char)Serial.read();
-    tempHum += c;
-    if (c == '\n') {
-      Serial.println(tempHum);
-      tempHum = "";
-    }
-  }
-  
+//  if(swSerial,available() > 0)
+//    println("hi");
+//  while(swSerial.available() > 0)
+//  {
+//    Serial.println("available");
+//    char c = (char)swSerial.read();
+//    tempHum += c;
+//    if (c == '\n') {
+//      Serial.println(tempHum);
+//      tempHum = "";
+//    }
+//  }
+  Serial.println(swSerial.read());
+  Serial.println("hi");  
+
   byte result = Ethernet.maintain();
   if(result==1||result==3)
   {
