@@ -3,8 +3,21 @@
 
 unsigned long currentTime;
 unsigned long previousAlarm;
-unsigned long ignoreTime = 60000;
+const unsigned long ignoreTime = 60000;
 bool ignoreAlarm = false;
+
+String supplyString;
+float supplyTemp;
+float supplyHum;
+float supplyTemps[] = {0,0,0,0,0};
+float supplyHums[] = {0,0,0,0,0};
+int supplyIndex = 0;
+
+float spaceTemp;
+float spaceHum;
+float spaceTemps[] = {0,0,0,0,0};
+float spaceHums[] = {0,0,0,0,0};
+int spaceIndex = 0;
 
 byte mac[] = { 0x90, 0xA2, 0xDA, 0x0F, 0x2C, 0x1E }; //physical mac address
 EthernetServer server(80); //server port
@@ -16,14 +29,10 @@ SoftwareSerial swSerial(5, 6); //RX(yellow), TX(green)
 
 String readString; 
 
-String tempHum;
-
 //////////////////////
 
 void setup()
 {
-  pinMode(5, INPUT); //swSerial RX
-  pinMode(6, OUTPUT); //swSerial TX
   pinMode(8, OUTPUT); //Christmas Lights
   digitalWrite(8, LOW);
   pinMode(3, INPUT); //Alarm
@@ -31,7 +40,7 @@ void setup()
   Serial.begin(9600);
   swSerial.begin(9600);
   
-  Serial.println("dorm control initializing...");
+//  Serial.println("dorm control initializing...");
   
   //start Ethernet
   if(Ethernet.begin(mac)==0)
@@ -42,7 +51,6 @@ void setup()
 //  Serial.print("Acquired IP Address: ");
 //  Serial.println(Ethernet.localIP());
   server.begin();
-  Serial.println("start");
 }
 
 void loop()
@@ -63,20 +71,32 @@ void loop()
     }
   }
 
-//  if(swSerial,available() > 0)
-//    println("hi");
-//  while(swSerial.available() > 0)
-//  {
-//    Serial.println("available");
-//    char c = (char)swSerial.read();
-//    tempHum += c;
-//    if (c == '\n') {
-//      Serial.println(tempHum);
-//      tempHum = "";
-//    }
-//  }
-  Serial.println(swSerial.read());
-  Serial.println("hi");  
+  while(swSerial.available() > 0) //Supply temp/hum
+  {
+    char c = (char)swSerial.read();
+    if (c == '\n')
+    {
+      int index = supplyString.indexOf(',');
+      supplyTemps[supplyIndex] = supplyString.substring(0, index).toFloat();
+      supplyHums[supplyIndex] = supplyString.substring(index + 2, supplyString.length()).toFloat();
+      float temp = 0;
+      float hum = 0;
+      for(int i = 0; i < 5; i++)
+      {
+        temp += supplyTemps[i];
+        hum += supplyHums[i];
+      }
+      supplyTemp = temp / 5.0f;
+      supplyHum = hum / 5.0f;
+      supplyString = "";
+      if(supplyIndex == 4)
+        supplyIndex = 0;
+      else
+        supplyIndex++;
+    }
+    else
+      supplyString += c;
+  }
 
   byte result = Ethernet.maintain();
   if(result==1||result==3)
@@ -185,14 +205,17 @@ void loop()
             client.println(F("<font face=\"verdana\">"));
   
             client.println(F("<h1>Control Panel</h1>"));
-            client.println(F("<p>&nbsp;</p>"));
+            
+            client.print(F("<p>Supply: ")); client.print(supplyTemp); client.print(F("&deg;F&nbsp;&nbsp;")); client.print(supplyHum); client.println(F("%RH"));
+            client.println(F("&nbsp;&nbsp;&nbsp;&nbsp;"));
+            client.print(F("Space: ")); client.print(spaceTemp); client.print(F("&deg;F&nbsp;&nbsp;")); client.print(spaceHum); client.println(F("%RH</p>"));
 
             client.println(F("<h3>Presets:</h3>"));
             client.println(F("<h3><a href=\"/?unlockmlon\"><font color=\"#00E600\">Unlock &amp; Main Light On</font></a>")); 
             client.println(F("&nbsp;&nbsp;&nbsp;"));
             client.println(F("<a href=\"/?lockalloff\"><font color=\"red\">All Off &amp; Lock</font></a>"));
             client.println(F("&nbsp;&nbsp;&nbsp;"));
-            client.println(F("<a href=\"/?mloffclon\">Main Light&rarr;Christmas Lights</a></h3>"));
+            client.println(F("<a href=\"/?mloffclon\">Main&rarr;Christmas</a></h3>"));
 
             client.println(F("<h3>Door:</h3>"));
             client.println(F("<h3><a href=\"/?unlock\"><font color=\"#00E600\">Unlock</font></a>")); 
