@@ -1,6 +1,11 @@
 #include <Ethernet.h>
 #include <SoftwareSerial.h>
 
+unsigned long currentTime;
+unsigned long previousAlarm;
+unsigned long ignoreTime = 60000;
+bool ignoreAlarm = false;
+
 byte mac[] = { 0x90, 0xA2, 0xDA, 0x0F, 0x2C, 0x1E }; //physical mac address
 EthernetServer server(80); //server port
 
@@ -10,6 +15,8 @@ SoftwareSerial swSerial(5, 6); //RX(yellow), TX(green)
 //swSerial = servo arduino
 
 String readString; 
+
+String tempHum;
 
 //////////////////////
 
@@ -37,10 +44,30 @@ void setup()
 
 void loop()
 {
-  if(digitalRead(2)) //Alarm
+  if(digitalRead(2) || ignoreAlarm) //Alarm
   {
-    swSerial.println("mlon");
-    delay(60000);
+    currentTime = millis();
+    if(ignoreAlarm)
+    {
+      if(currentTime - previousAlarm > ignoreTime)
+        ignoreAlarm = false;
+    }
+    else
+    {
+      swSerial.println("mlon");
+      ignoreAlarm = true;
+      previousAlarm = currentTime;
+    }
+  }
+
+  while(swSerial.available())
+  {
+    char c = (char)Serial.read();
+    tempHum += c;
+    if (c == '\n') {
+      Serial.println(tempHum);
+      tempHum = "";
+    }
   }
   
   byte result = Ethernet.maintain();
