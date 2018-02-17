@@ -88,6 +88,7 @@ void loop()
       }
       supplyTemp = temp / 5.0f;
       supplyHum = hum / 5.0f;
+      Serial.print(supplyTemp); Serial.print(", "); Serial.println(supplyHum);
       supplyString = "";
       if(supplyIndex == 4)
         supplyIndex = 0;
@@ -153,7 +154,7 @@ void loop()
             }
             if(command.equals("mloffclon")) {
               swSerial.println("mloff");
-              delay(300);
+              delay(100);
               digitalWrite(8, HIGH);
             }
             if(command.equals("unlock"))
