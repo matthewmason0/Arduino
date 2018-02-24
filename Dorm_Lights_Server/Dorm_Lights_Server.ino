@@ -55,6 +55,14 @@ void setup()
 
 void loop()
 {
+  ////alert flash
+  //while (true)
+  //{
+  //  digitalWrite(8, HIGH);
+  //  delay(50);
+  //  digitalWrite(8, LOW);
+  //  delay(150);
+  //}
   if(digitalRead(2) || ignoreAlarm) //Alarm
   {
     currentTime = millis();
@@ -88,7 +96,7 @@ void loop()
       }
       supplyTemp = temp / 5.0f;
       supplyHum = hum / 5.0f;
-      Serial.print(supplyTemp); Serial.print(", "); Serial.println(supplyHum);
+      //Serial.print(supplyTemp); Serial.print(", "); Serial.println(supplyHum);
       supplyString = "";
       if(supplyIndex == 4)
         supplyIndex = 0;
