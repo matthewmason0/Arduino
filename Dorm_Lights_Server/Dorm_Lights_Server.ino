@@ -6,18 +6,18 @@ unsigned long previousAlarm;
 const unsigned long ignoreTime = 60000;
 bool ignoreAlarm = false;
 
-String supplyString;
+String tempString;
+int tempIndex = 0;
+
 float supplyTemp;
 float supplyHum;
 float supplyTemps[] = {0,0,0,0,0};
 float supplyHums[] = {0,0,0,0,0};
-int supplyIndex = 0;
 
 float spaceTemp;
 float spaceHum;
 float spaceTemps[] = {0,0,0,0,0};
 float spaceHums[] = {0,0,0,0,0};
-int spaceIndex = 0;
 
 byte mac[] = { 0x90, 0xA2, 0xDA, 0x0F, 0x2C, 0x1E }; //physical mac address
 EthernetServer server(80); //server port
@@ -79,32 +79,44 @@ void loop()
     }
   }
 
-  while(swSerial.available() > 0) //Supply temp/hum
+  while(swSerial.available() > 0) //Supply & Space temp/hum
   {
     char c = (char)swSerial.read();
     if (c == '\n')
     {
-      int index = supplyString.indexOf(',');
-      supplyTemps[supplyIndex] = supplyString.substring(0, index).toFloat();
-      supplyHums[supplyIndex] = supplyString.substring(index + 2, supplyString.length()).toFloat();
-      float temp = 0;
-      float hum = 0;
+      int semicolon = tempString.indexOf(';');
+      String supplyString = tempString.substring(0, semicolon);
+      String spaceString = tempString.substring(semicolon + 2, tempString.length());
+      int comma = supplyString.indexOf(',');
+      supplyTemps[tempIndex] = supplyString.substring(0, comma).toFloat();
+      supplyHums[tempIndex] = supplyString.substring(comma + 2, supplyString.length()).toFloat();
+      spaceTemps[tempIndex] = spaceString.substring(0, comma).toFloat();
+      spaceHums[tempIndex] = spaceString.substring(comma + 2, spaceString.length()).toFloat();
+      float supTemp = 0;
+      float supHum = 0;
+      float spTemp = 0;
+      float spHum = 0;
       for(int i = 0; i < 5; i++)
       {
-        temp += supplyTemps[i];
-        hum += supplyHums[i];
+        supTemp += supplyTemps[i];
+        supHum += supplyHums[i];
+        spTemp += spaceTemps[i];
+	spHum += spaceHums[i];
       }
-      supplyTemp = temp / 5.0f;
-      supplyHum = hum / 5.0f;
-      //Serial.print(supplyTemp); Serial.print(", "); Serial.println(supplyHum);
-      supplyString = "";
-      if(supplyIndex == 4)
-        supplyIndex = 0;
+      supplyTemp = supTemp / 5.0f;
+      supplyHum = supHum / 5.0f;
+      spaceTemp = spTemp / 5.0f;
+      spaceHum = spHum / 5.0f;
+      //Serial.print(supplyTemp); Serial.print(", "); Serial.print(supplyHum); Serial.print("; ");
+      //Serial.print(spaceTemp); Serial.print(", "); Serial.println(spaceHum);
+      tempString = "";
+      if(tempIndex == 4)
+        tempIndex = 0;
       else
-        supplyIndex++;
+        tempIndex++;
     }
     else
-      supplyString += c;
+      tempString += c;
   }
 
   byte result = Ethernet.maintain();
