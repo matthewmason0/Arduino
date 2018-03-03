@@ -6,14 +6,15 @@ Servo mloff;
 Servo unlock;
 Servo lock;
 
-DHT dht(12, DHT11);
+DHT supplyDHT(12, DHT11);
+DHT spaceDHT(10, DHT11);
 
 static constexpr int MLON = 3;
 static constexpr int MLOFF = 4;
 static constexpr int UNLOCK = 5;
 static constexpr int LOCK = 6;
 
-int mlon_info[]   = {130, 170, 200}; //normal, activated, slew time
+int mlon_info[]   = {130, 170, 200}; //normal, activated, individual slew time
 int mloff_info[]  = {90, 165,  300};
 int unlock_info[] = {160, 0,   500};
 int lock_info[]   = {0, 170,   400};
@@ -31,14 +32,17 @@ void setup()
 {
   command.reserve(200);
 
+  pinMode( 9, OUTPUT);
   pinMode(11, OUTPUT);
   pinMode(13, OUTPUT);
+  digitalWrite( 9, HIGH);
   digitalWrite(11, HIGH);
   digitalWrite(13, LOW);
 
   Serial.begin(9600);
   
-  dht.begin();
+  supplyDHT.begin();
+  spaceDHT.begin();
   
   mlon.attach(MLON);
   mloff.attach(MLOFF);
@@ -63,12 +67,15 @@ void loop()
   currentTime = millis();
   if(currentTime - previousTransmit > transmitInterval)
   {
-    float temp = dht.readTemperature(true);
-    float hum = dht.readHumidity();
-    if(isnan(temp) || isnan(hum));
+    float supplyTemp = supplyDHT.readTemperature(true);
+    float spaceTemp  = spaceDHT.readTemperature(true);
+    float supplyHum = supplyDHT.readHumidity();
+    float spaceHum  = spaceDHT.readHumidity();
+    if(isnan(supplyTemp) || isnan(spaceTemp) || isnan(supplyHum) || isnan(spaceHum));
     else
     {
-      Serial.print(temp); Serial.print(", "); Serial.println(hum);
+      Serial.print(supplyTemp); Serial.print(", "); Serial.print(supplyHum); Serial.print(", ");
+      Serial.print(spaceTemp); Serial.print(", "); Serial.println(spaceHum);
       previousTransmit = currentTime;
     }
   }
