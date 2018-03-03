@@ -74,7 +74,7 @@ void loop()
     if(isnan(supplyTemp) || isnan(spaceTemp) || isnan(supplyHum) || isnan(spaceHum));
     else
     {
-      Serial.print(supplyTemp); Serial.print(", "); Serial.print(supplyHum); Serial.print(", ");
+      Serial.print(supplyTemp); Serial.print(", "); Serial.print(supplyHum); Serial.print("; ");
       Serial.print(spaceTemp); Serial.print(", "); Serial.println(spaceHum);
       previousTransmit = currentTime;
     }
