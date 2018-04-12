@@ -1,6 +1,11 @@
 #include <Ethernet.h>
 #include <SoftwareSerial.h>
 
+bool locked = false;
+bool ml = false;
+bool cl = false;
+bool tv = false;
+
 unsigned long currentTime;
 unsigned long previousAlarm;
 const unsigned long ignoreTime = 60000;
@@ -164,47 +169,63 @@ void loop()
             
             String command = readString.substring(index+1, readString.length()-11);
                         
-            if(command.equals("unlockmlon"))
+            if(command.equals("unlockmlon")) {
               swSerial.println("unlockmlon");
-              
-            if(command.equals("lockalloff")) {
+              locked = false;
+              ml = true;
+            }
+            else if(command.equals("lockalloff")) {
               Serial.println("tvoff");
               swSerial.println("lockmloff");
               digitalWrite(8, LOW);
+              tv = false;
+              locked = false;
+              ml = false;
+              cl = false;
             }
-            if(command.equals("mloffclon")) {
+            else if(command.equals("mloffclon")) {
               swSerial.println("mloff");
               delay(100);
               digitalWrite(8, HIGH);
+              ml = false;
+              cl = true;
             }
-            if(command.equals("unlock"))
+            else if(command.equals("unlock")) {
               swSerial.println("unlock");
-              
-            if(command.equals("lock"))
+              locked = false;
+            }
+            else if(command.equals("lock")) {
               swSerial.println("lock");
-              
-            if(command.equals("mlon"))
+              locked = true;
+            }
+            else if(command.equals("mlon") || (command.equals("mltoggle") && !ml)) {
               swSerial.println("mlon");
-              
-            if(command.equals("mloff"))
+              ml = true;
+            }
+            else if(command.equals("mloff") || (command.equals("mltoggle") && ml)) {
               swSerial.println("mloff");
-              
-            if(command.equals("clon"))
+              ml = false;
+            }
+            else if(command.equals("clon") || (command.equals("cltoggle") && !cl)) {
               digitalWrite(8, HIGH);
-              
-            if(command.equals("cloff"))
+              cl = true;
+            }
+            else if(command.equals("cloff") || (command.equals("cltoggle") && cl)) {
               digitalWrite(8, LOW);
-              
-            if(command.equals("tvon"))
+              cl = false;
+            }
+            else if(command.equals("tvon") || (command.equals("tvtoggle") && !tv)) {
               Serial.println("tvon");
-              
-            if(command.equals("tvoff"))
+              tv = true;
+            }
+            else if(command.equals("tvoff") || (command.equals("tvtoggle") && tv)) {
               Serial.println("tvoff");
-              
-            if(command.equals("hdmi1"))
+              tv = false;
+            }
+            else if(command.equals("hdmi1"))
               Serial.println("hdmi1");
               
-            if(command.equals("hdmi2"))
+            else if(command.equals("hdmi2"))
               Serial.println("hdmi2");
               
           }
@@ -238,28 +259,44 @@ void loop()
             client.println(F("&nbsp;&nbsp;&nbsp;"));
             client.println(F("<a href=\"/?mloffclon\">Main&rarr;Christmas</a></h3>"));
 
-            client.println(F("<h3>Door:</h3>"));
-            client.println(F("<h3><a href=\"/?unlock\"><font color=\"#00E600\">Unlock</font></a>")); 
-            client.println(F("&nbsp;&nbsp;&nbsp;"));
-            client.println(F("<a href=\"/?lock\"><font color=\"red\">Lock</font></a></h3>"));
+            client.println(F("<h3>Door: "));
+            if (locked) {
+              client.println(F("<font color=\"red\">LOCKED</font></h3>"));
+              client.println(F("<h3><a href=\"/?unlock\"><font color=\"#00E600\">Unlock</font></a></h3>"));
+            } else {
+              client.println(F("<font color=\"#00E600\">UNLOCKED</font></h3>"));
+              client.println(F("<h3><a href=\"/?lock\"><font color=\"red\">Lock</font></a></h3>"));
+            }
 
-            client.println(F("<h3>Main Light:</h3>"));
-            client.println(F("<h3><a href=\"/?mlon\"><font color=\"#00E600\">Turn On</font></a>")); 
-            client.println(F("&nbsp;&nbsp;&nbsp;"));
-            client.println(F("<a href=\"/?mloff\"><font color=\"red\">Turn Off</font></a></h3>"));
+            client.println(F("<h3>Main Light: "));
+            if (ml) {
+              client.println(F("<font color=\"#E1E100\">ON</font></h3>"));
+              client.println(F("<h3><a href=\"/?mloff\"><font color=\"red\">Turn Off</font></a></h3>"));
+            } else {
+              client.println(F("<font color=\"gray\">OFF</font></h3>"));
+              client.println(F("<h3><a href=\"/?mlon\"><font color=\"#00E600\">Turn On</font></a></h3>")); 
+            }
 
-            client.println(F("<h3>Christmas Lights:</h3>"));
-            client.println(F("<h3><a href=\"/?clon\"><font color=\"#00E600\">Turn On</font></a>")); 
-            client.println(F("&nbsp;&nbsp;&nbsp;"));
-            client.println(F("<a href=\"/?cloff\"><font color=\"red\">Turn Off</font></a></h3>"));
+            client.println(F("<h3>Christmas Lights: "));
+            if (cl) {
+              client.println(F("<font color=\"#E1E100\">ON</font></h3>"));
+              client.println(F("<h3><a href=\"/?cloff\"><font color=\"red\">Turn Off</font></a></h3>"));
+            } else {
+              client.println(F("<font color=\"gray\">OFF</font></h3>"));
+              client.println(F("<h3><a href=\"/?clon\"><font color=\"#00E600\">Turn On</font></a></h3>")); 
+            }
 
-            client.println(F("<h3>TV:</h3>"));
-            client.println(F("<h3><a href=\"/?tvon\"><font color=\"#00E600\">Turn On</font></a>")); 
-            client.println(F("&nbsp;&nbsp;&nbsp;"));
-            client.println(F("<a href=\"/?tvoff\"><font color=\"red\">Turn Off</font></a></h3>"));
-            client.println(F("<h3><a href=\"/?hdmi1\">HDMI 1</a>")); 
-            client.println(F("&nbsp;&nbsp;&nbsp;"));
-            client.println(F("<a href=\"/?hdmi2\">HDMI 2</a></h3>"));
+            client.println(F("<h3>TV: "));
+            if (tv) {
+              client.println(F("<font color=\"#E1E100\">ON</font></h3>"));
+              client.println(F("<h3><a href=\"/?tvoff\"><font color=\"red\">Turn Off</font></a></h3>"));
+              client.println(F("<h3><a href=\"/?hdmi1\">HDMI 1</a>")); 
+              client.println(F("&nbsp;&nbsp;&nbsp;"));
+              client.println(F("<a href=\"/?hdmi2\">HDMI 2</a></h3>"));
+            } else {
+              client.println(F("<font color=\"gray\">OFF</font></h3>"));
+              client.println(F("<h3><a href=\"/?tvon\"><font color=\"#00E600\">Turn On</font></a></h3>")); 
+            }
 
             client.println(F("</font>"));
             client.println(F("</BODY>"));
