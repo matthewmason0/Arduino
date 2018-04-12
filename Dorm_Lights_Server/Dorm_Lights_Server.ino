@@ -79,6 +79,7 @@ void loop()
     else
     {
       swSerial.println("mlon");
+      ml = true;
       ignoreAlarm = true;
       previousAlarm = currentTime;
     }
