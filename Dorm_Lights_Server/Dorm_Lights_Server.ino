@@ -180,7 +180,7 @@ void loop()
               swSerial.println("lockmloff");
               digitalWrite(8, LOW);
               tv = false;
-              locked = false;
+              locked = true;
               ml = false;
               cl = false;
             }
