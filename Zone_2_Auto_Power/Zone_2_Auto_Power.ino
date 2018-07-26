@@ -9,8 +9,10 @@ bool ignoreNextZ2ON = false;
 
 void setup()
 {
-  pinMode(13, OUTPUT);
+  pinMode(3, OUTPUT);
   pinMode(12, OUTPUT);
+  pinMode(13, OUTPUT);
+  analogWrite(3, 95);
   digitalWrite(12, LOW);
   digitalWrite(13, LOW);
 
