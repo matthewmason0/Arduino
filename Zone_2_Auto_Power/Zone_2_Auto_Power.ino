@@ -17,6 +17,7 @@ void setup()
   digitalWrite(13, LOW);
 
   swSerial.begin(9600);
+  Serial.begin(9600);
 }
 
 void loop()
@@ -31,12 +32,23 @@ void loop()
 
     if (c == '\r')
     {
+      Serial.println(readString);
       //second Z2ON from standby
       if (ignoreNextZ2ON && readString.equals("Z2ON"))
+      {
+        readNext = false;
         ignoreNextZ2ON = false;
+      }
       //second PWON from standby
       else if (ignoreNextZ2ON && readString.equals("PWON"))
-        ;
+        readNext = false;
+      //PWSTANDBY w/ no Z2OFF bug fix
+      else if (ignoreNextZ2ON && readString.equals("PWSTANDBY"))
+      {
+        readNext = false;
+        ignoreNextZ2ON = false;
+        sendPowerButton();
+      }
       //first Z2ON from standby
       else if (readNext && readString.equals("Z2ON"))
       {
@@ -46,7 +58,10 @@ void loop()
       }
       //first PWON from standby
       else if (readString.indexOf("PWON") >= 0) //contains
+      {
         readNext = true;
+        ignoreNextZ2ON = false;
+      }
       //normal (main zone already on)
       else if (readString.equals("Z2ON") || readString.equals("Z2OFF"))
       {
