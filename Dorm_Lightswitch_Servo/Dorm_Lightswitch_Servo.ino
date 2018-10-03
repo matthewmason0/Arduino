@@ -14,12 +14,12 @@ enum Servos      { MLON, MLOFF, FON, FOFF, CLON, CLOFF };
 Servo servos[] = { mlon, mloff, fon, foff, clon, cloff };
 
 enum Info { PIN, NORMAL, ACTIVATED, SLEW };
-int info[][4] = { { 2, 70,  130, 700 },   //MLON
+int info[][4] = { { 2, 70,  130, 800 },   //MLON
                   { 3, 90,  10,  600 },   //MLOFF
-                  { 4, 85,  120, 300 },   //FON
+                  { 4, 85,  120, 500 },   //FON
                   { 5, 75,  0,   700 },   //FOFF
-                  { 6, 130, 170, 200 },   //CLON
-                  { 7, 90,  165, 300 } }; //CLOFF
+                  { 6, 65,  115, 500 },   //CLON
+                  { 7, 80,  180, 600 } }; //CLOFF
 
 static constexpr int HL = 8;
 
@@ -33,7 +33,6 @@ static constexpr int SLEW_TIME = 500;
 //unsigned long transmitInterval = 2000;
 
 String command = "";
-bool commandAvailable = false;
 
 void setup()
 {
@@ -95,8 +94,17 @@ void loop()
   }
 */
   
-  if (commandAvailable)
+  if (Serial.available())
   {
+    char c = 0;
+    while (c != '\n')
+    {
+      if (Serial.available())
+      {
+        c = (char)Serial.read();
+        command += c;
+      }
+    }
     command.trim();
     if (command.equals("mlon"))
       activateServo(MLON);
@@ -115,20 +123,7 @@ void loop()
     if (command.equals("hloff"))
       digitalWrite(HL, LOW);
     command = "";
-    commandAvailable = false;
   }
   
   delay(1);
-}
-
-void serialEvent()
-{
-  while (Serial.available())
-  {
-    char c = (char)Serial.read();
-    command += c;
-    if (c == '\n') {
-      commandAvailable = true;
-    }
-  }
 }
