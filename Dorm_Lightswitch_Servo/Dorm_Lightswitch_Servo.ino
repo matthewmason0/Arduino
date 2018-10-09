@@ -14,7 +14,7 @@ enum Servos      { MLON, MLOFF, FON, FOFF, CLON, CLOFF };
 Servo servos[] = { mlon, mloff, fon, foff, clon, cloff };
 
 enum Info { PIN, NORMAL, ACTIVATED, SLEW };
-int info[][4] = { { 2, 70,  130, 800 },   //MLON
+int info[][4] = { { 2, 70,  150, 600 },   //MLON
                   { 3, 90,  10,  600 },   //MLOFF
                   { 4, 85,  120, 500 },   //FON
                   { 5, 75,  0,   700 },   //FOFF
