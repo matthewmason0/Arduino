@@ -48,34 +48,34 @@ void setup()
   digitalWrite(13, LOW);
 
   Serial.begin(9600);
-  
+
   //supplyDHT.begin();
   //spaceDHT.begin();
- 
+
   for (int i = 0; i < NUM_SERVOS; i++)
   {
     servos[i].attach(info[i][PIN]);
     servos[i].write(info[i][NORMAL]);
   }
-  
+
   delay(SLEW_TIME);
 
-  for (int i = 0; i < NUM_SERVOS; i++)
-    servos[i].detach();
+  // for (int i = 0; i < NUM_SERVOS; i++)
+  //   servos[i].detach();
 }
 
 void activateServo(Servos s)
 {
-  servos[s].attach(info[s][PIN]);
+  // servos[s].attach(info[s][PIN]);
   servos[s].write(info[s][ACTIVATED]);
   delay(info[s][SLEW]);
   servos[s].write(info[s][NORMAL]);
   delay(info[s][SLEW]);
-  servos[s].detach();
+  // servos[s].detach();
 }
 
 void loop()
-{ 
+{
 /*
   currentTime = millis();
   if(currentTime - previousTransmit > transmitInterval)
@@ -93,7 +93,7 @@ void loop()
     }
   }
 */
-  
+
   if (Serial.available())
   {
     char c = 0;
@@ -124,6 +124,6 @@ void loop()
       digitalWrite(HL, LOW);
     command = "";
   }
-  
+
   delay(1);
 }
