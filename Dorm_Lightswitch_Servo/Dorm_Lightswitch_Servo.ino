@@ -1,5 +1,5 @@
 #include <Servo.h>
-//#include <DHT.h>
+#include <DHT.h>
 
 static constexpr int NUM_SERVOS = 6;
 
@@ -14,7 +14,7 @@ enum Servos      { MLON, MLOFF, FON, FOFF, CLON, CLOFF };
 Servo servos[] = { mlon, mloff, fon, foff, clon, cloff };
 
 enum Info { PIN, NORMAL, ACTIVATED, SLEW };
-int info[][4] = { { 2, 70,  150, 600 },   //MLON
+int info[][4] = { { 2, 70,  150, 800 },   //MLON
                   { 3, 80,  30,  400 },   //MLOFF
                   { 4, 85,  120, 300 },   //FON
                   { 5, 75,  0,   700 },   //FOFF
@@ -25,14 +25,13 @@ static constexpr int HL = 8;
 
 static constexpr int SLEW_TIME = 500;
 
-//DHT supplyDHT(12, DHT11);
-//DHT spaceDHT(10, DHT11);
+DHT spaceDHT(9, DHT11);
 
 unsigned long servoResetInterval = 500;
-//unsigned long sensorReadInterval = 2000;
+unsigned long sensorReadInterval = 2000;
 unsigned long currentTime;
 unsigned long previousReset = 0;
-//unsigned long previousRead = 0;
+unsigned long previousRead = 0;
 
 String command = "";
 
@@ -40,19 +39,14 @@ void setup()
 {
   command.reserve(200);
 
-  //pinMode( 9, OUTPUT);
-  //pinMode(11, OUTPUT);
   pinMode(HL, OUTPUT);
   pinMode(13, OUTPUT);
-  //digitalWrite( 9, HIGH);
-  //digitalWrite(11, HIGH);
   digitalWrite(HL, LOW);
   digitalWrite(13, LOW);
 
   Serial.begin(9600);
 
-  //supplyDHT.begin();
-  //spaceDHT.begin();
+  spaceDHT.begin();
 
   for (int i = 0; i < NUM_SERVOS; i++)
   {
@@ -67,17 +61,18 @@ void setup()
 
 void activateServo(Servos s)
 {
-   servos[s].attach(info[s][PIN]);
+  servos[s].attach(info[s][PIN]);
   servos[s].write(info[s][ACTIVATED]);
   delay(info[s][SLEW]);
   servos[s].write(info[s][NORMAL]);
   delay(info[s][SLEW]);
-   servos[s].detach();
+  servos[s].detach();
 }
 
 void loop()
 {
   currentTime = millis();
+
   if(currentTime - previousReset > servoResetInterval)
   {
     for (int i = 0; i < NUM_SERVOS; i++)
@@ -90,22 +85,18 @@ void loop()
       servos[i].detach();
     previousReset = currentTime;
   }
-/*
-  if(currentTime - previousTransmit > transmitInterval)
+
+  if(currentTime - previousRead > sensorReadInterval)
   {
-    float supplyTemp = supplyDHT.readTemperature(true);
-    float spaceTemp  = spaceDHT.readTemperature(true);
-    float supplyHum = supplyDHT.readHumidity();
+    float spaceTemp  = spaceDHT.readTemperature(false); //true F, false C
     float spaceHum  = spaceDHT.readHumidity();
-    if(isnan(supplyTemp) || isnan(spaceTemp) || isnan(supplyHum) || isnan(spaceHum));
+    if(isnan(spaceTemp) || isnan(spaceHum));
     else
     {
-      Serial.print(supplyTemp); Serial.print(", "); Serial.print(supplyHum); Serial.print("; ");
-      Serial.print(spaceTemp); Serial.print(", "); Serial.println(spaceHum);
-      previousTransmit = currentTime;
+      Serial.print(spaceTemp); Serial.print(" "); Serial.println(spaceHum);
+      previousRead = currentTime;
     }
   }
-*/
 
   if (Serial.available())
   {
