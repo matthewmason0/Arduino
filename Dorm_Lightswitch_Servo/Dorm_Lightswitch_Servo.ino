@@ -16,7 +16,7 @@ Servo servos[] = { mlon, mloff, fon, foff, clon, cloff };
 enum Info { PIN, NORMAL, ACTIVATED, SLEW };
 int info[][4] = { { 2, 70,  150, 800 },   //MLON
                   { 3, 80,  30,  400 },   //MLOFF
-                  { 4, 85,  130, 400 },   //FON
+                  { 4, 85,  150, 500 },   //FON
                   { 5, 75,  0,   700 },   //FOFF
                   { 6, 65,  115, 500 },   //CLON
                   { 7, 80,  180, 600 } }; //CLOFF
@@ -93,6 +93,8 @@ void loop()
     if(isnan(spaceTemp) || isnan(spaceHum));
     else
     {
+      spaceTemp -= 2.5;
+      spaceHum -= 10;
       Serial.print(spaceTemp); Serial.print(" "); Serial.println(spaceHum);
       previousRead = currentTime;
     }
