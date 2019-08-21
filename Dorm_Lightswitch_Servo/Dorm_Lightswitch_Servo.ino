@@ -21,11 +21,15 @@ int info[][4] = { { 2, 70,  150, 800 },   //MLON
                   { 6, 65,  115, 500 },   //CLON
                   { 7, 80,  180, 600 } }; //CLOFF
 
+static constexpr int INITIAL_SLEW = 500;
+
 static constexpr int HL = 8;
 
-static constexpr int SLEW_TIME = 500;
-
 DHT spaceDHT(9, DHT11);
+
+Servo blinds;
+static constexpr int BLINDS = 10;
+int blindsPos = 499;
 
 unsigned long servoResetInterval = 500;
 unsigned long sensorReadInterval = 2000;
@@ -34,6 +38,31 @@ unsigned long previousReset = 0;
 unsigned long previousRead = 0;
 
 String command = "";
+
+void moveBlinds(int percent)
+{
+  //blinds.attach(BLINDS);
+  int targetPos = percent * 20 + 500;
+  bool dir = blindsPos < targetPos;
+  for (int i = blindsPos; dir ? i <= targetPos : i >= targetPos; dir ? i++ : i--)
+  {
+    blinds.writeMicroseconds(i);
+    delay(7);
+  }
+  blindsPos = targetPos;
+  //blinds.detach();
+  //digitalWrite(BLINDS, LOW);
+}
+
+void activateServo(Servos s)
+{
+  servos[s].attach(info[s][PIN]);
+  servos[s].write(info[s][ACTIVATED]);
+  delay(info[s][SLEW]);
+  servos[s].write(info[s][NORMAL]);
+  delay(info[s][SLEW]);
+  servos[s].detach();
+}
 
 void setup()
 {
@@ -53,27 +82,20 @@ void setup()
     servos[i].attach(info[i][PIN]);
     servos[i].write(info[i][NORMAL]);
   }
-  delay(SLEW_TIME);
+  delay(INITIAL_SLEW);
 
    for (int i = 0; i < NUM_SERVOS; i++)
      servos[i].detach();
-}
 
-void activateServo(Servos s)
-{
-  servos[s].attach(info[s][PIN]);
-  servos[s].write(info[s][ACTIVATED]);
-  delay(info[s][SLEW]);
-  servos[s].write(info[s][NORMAL]);
-  delay(info[s][SLEW]);
-  servos[s].detach();
+  blinds.attach(BLINDS);
+  moveBlinds(0);
 }
 
 void loop()
 {
   currentTime = millis();
 
-  if(currentTime - previousReset > servoResetInterval)
+  if (currentTime - previousReset > servoResetInterval)
   {
     for (int i = 0; i < NUM_SERVOS; i++)
     {
@@ -86,11 +108,11 @@ void loop()
     previousReset = currentTime;
   }
 
-  if(currentTime - previousRead > sensorReadInterval)
+  if (currentTime - previousRead > sensorReadInterval)
   {
     float spaceTemp  = spaceDHT.readTemperature(false); //true F, false C
     float spaceHum  = spaceDHT.readHumidity();
-    if(isnan(spaceTemp) || isnan(spaceHum));
+    if (isnan(spaceTemp) || isnan(spaceHum));
     else
     {
       spaceTemp -= 2.5;
@@ -128,6 +150,9 @@ void loop()
       digitalWrite(HL, HIGH);
     if (command.equals("hloff"))
       digitalWrite(HL, LOW);
+    int index = command.indexOf('b');
+    if (index != -1)
+      moveBlinds(command.substring(index + 1).toInt());
     command = "";
   }
   
