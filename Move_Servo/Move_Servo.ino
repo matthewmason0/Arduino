@@ -6,16 +6,15 @@ String input = "";
 
 void setup()
 {
-  for (int i = 2; i <= 7; i++)
-  {
+  for (int i = 2; i <= 10; i++)
     pinMode(i, OUTPUT);
-    digitalWrite(i, LOW);
-  }
   Serial.begin(9600);
 }
 
 void loop()
 {
+  for (int i = 2; i <= 10; i++)
+    digitalWrite(i, LOW);
   bool init = true;
   while (init)
   {
@@ -41,7 +40,7 @@ void loop()
       char c = Serial.read();
       if (c == '\n')
       {
-        s.write(input.toInt());
+        s.writeMicroseconds(input.toInt());
         input = "";
       }
       else if (c == 'q')
