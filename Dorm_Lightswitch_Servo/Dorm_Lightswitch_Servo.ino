@@ -22,6 +22,7 @@ int info[][4] = { { 2, 70,  150, 800 },   //MLON
                   { 7, 80,  180, 600 } }; //CLOFF
 
 static constexpr int INITIAL_SLEW = 500;
+static constexpr int RESET_SLEW = 50;
 
 static constexpr int HL = 8;
 
@@ -29,40 +30,15 @@ DHT spaceDHT(9, DHT11);
 
 Servo blinds;
 static constexpr int BLINDS = 10;
-int blindsPos = 499;
+int blindsPos = 900;
 
-unsigned long servoResetInterval = 500;
+unsigned long servoResetInterval = 2000; //500
 unsigned long sensorReadInterval = 2000;
 unsigned long currentTime;
 unsigned long previousReset = 0;
 unsigned long previousRead = 0;
 
 String command = "";
-
-void moveBlinds(int percent)
-{
-  //blinds.attach(BLINDS);
-  int targetPos = percent * 20 + 500;
-  bool dir = blindsPos < targetPos;
-  for (int i = blindsPos; dir ? i <= targetPos : i >= targetPos; dir ? i++ : i--)
-  {
-    blinds.writeMicroseconds(i);
-    delay(7);
-  }
-  blindsPos = targetPos;
-  //blinds.detach();
-  //digitalWrite(BLINDS, LOW);
-}
-
-void activateServo(Servos s)
-{
-  servos[s].attach(info[s][PIN]);
-  servos[s].write(info[s][ACTIVATED]);
-  delay(info[s][SLEW]);
-  servos[s].write(info[s][NORMAL]);
-  delay(info[s][SLEW]);
-  servos[s].detach();
-}
 
 void setup()
 {
@@ -84,11 +60,37 @@ void setup()
   }
   delay(INITIAL_SLEW);
 
-   for (int i = 0; i < NUM_SERVOS; i++)
-     servos[i].detach();
+  for (int i = 0; i < NUM_SERVOS; i++)
+    servos[i].detach();
 
   blinds.attach(BLINDS);
-  moveBlinds(0);
+  blinds.writeMicroseconds(blindsPos);
+}
+
+void moveBlinds(int targetPos)
+{
+  if (targetPos == 900 && blindsPos != 900)
+    moveBlinds(500);
+  //blinds.attach(BLINDS);
+  bool dir = blindsPos < targetPos;
+  for (int i = blindsPos; dir ? i <= targetPos : i >= targetPos; dir ? i++ : i--)
+  {
+    blinds.writeMicroseconds(i);
+    delay(7);
+  }
+  blindsPos = targetPos;
+  //blinds.detach();
+  //digitalWrite(BLINDS, LOW);
+}
+
+void activateServo(Servos s)
+{
+  servos[s].attach(info[s][PIN]);
+  servos[s].write(info[s][ACTIVATED]);
+  delay(info[s][SLEW]);
+  servos[s].write(info[s][NORMAL]);
+  delay(info[s][SLEW]);
+  servos[s].detach();
 }
 
 void loop()
@@ -102,7 +104,7 @@ void loop()
       servos[i].attach(info[i][PIN]);
       servos[i].write(info[i][NORMAL]);
     }
-    delay(50);
+    delay(RESET_SLEW);
     for (int i = 0; i < NUM_SERVOS; i++)
       servos[i].detach();
     previousReset = currentTime;
@@ -152,7 +154,11 @@ void loop()
       digitalWrite(HL, LOW);
     int index = command.indexOf('b');
     if (index != -1)
-      moveBlinds(command.substring(index + 1).toInt());
+    {
+      int percent = command.substring(index + 1).toInt();
+      int targetPos = percent * 12 + 900;
+      moveBlinds(targetPos);
+    }
     command = "";
   }
   
