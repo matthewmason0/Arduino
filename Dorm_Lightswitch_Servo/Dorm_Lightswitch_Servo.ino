@@ -1,27 +1,26 @@
 #include <Servo.h>
 #include <DHT.h>
 
-static constexpr int NUM_SERVOS = 6;
+static constexpr int NUM_SERVOS = 4;
+static constexpr int SERVOS_ENABLE = 6;
+void enableServos() { digitalWrite(SERVOS_ENABLE, HIGH); delay(300); }
+void disableServos() { digitalWrite(SERVOS_ENABLE, LOW); }
 
 Servo mlon;
 Servo mloff;
 Servo fon;
 Servo foff;
-Servo clon;
-Servo cloff;
 
-enum Servos      { MLON, MLOFF, FON, FOFF, CLON, CLOFF };
-Servo servos[] = { mlon, mloff, fon, foff, clon, cloff };
+enum Servos      { MLON, MLOFF, FON, FOFF };
+Servo servos[] = { mlon, mloff, fon, foff };
 
 enum Info { PIN, NORMAL, ACTIVATED, SLEW };
-int info[][4] = { { 2, 70,  150, 800 },   //MLON
-                  { 3, 80,  30,  400 },   //MLOFF
+int info[][4] = { { 2, 70,  150, 1800 },   //MLON
+                  { 3, 80,  30,  800 },   //MLOFF
                   { 4, 85,  150, 500 },   //FON
-                  { 5, 75,  0,   700 },   //FOFF
-                  { 6, 65,  115, 500 },   //CLON
-                  { 7, 80,  180, 600 } }; //CLOFF
+                  { 5, 75,  0,   850 } }; //FOFF
 
-static constexpr int INITIAL_SLEW = 500;
+static constexpr int INITIAL_SLEW = 800;
 static constexpr int RESET_SLEW = 50;
 
 static constexpr int HL = 8;
@@ -30,9 +29,12 @@ DHT spaceDHT(9, DHT11);
 
 Servo blinds;
 static constexpr int BLINDS = 10;
+static constexpr int BLINDS_ENABLE = 11;
 int blindsPos = 900;
+void enableBlinds() { digitalWrite(BLINDS_ENABLE, HIGH); }
+void disableBlinds() { digitalWrite(BLINDS_ENABLE, LOW); }
 
-unsigned long servoResetInterval = 2000; //500
+unsigned long servoResetInterval = 500;
 unsigned long sensorReadInterval = 2000;
 unsigned long currentTime;
 unsigned long previousReset = 0;
@@ -44,34 +46,44 @@ void setup()
 {
   command.reserve(200);
 
+  pinMode(SERVOS_ENABLE, OUTPUT);
   pinMode(HL, OUTPUT);
+  pinMode(BLINDS_ENABLE, OUTPUT);
   pinMode(13, OUTPUT);
+  digitalWrite(SERVOS_ENABLE, LOW);
   digitalWrite(HL, LOW);
+  digitalWrite(BLINDS_ENABLE, LOW);
   digitalWrite(13, LOW);
 
   Serial.begin(9600);
 
   spaceDHT.begin();
 
+  enableServos();
   for (int i = 0; i < NUM_SERVOS; i++)
   {
     servos[i].attach(info[i][PIN]);
     servos[i].write(info[i][NORMAL]);
   }
   delay(INITIAL_SLEW);
-
   for (int i = 0; i < NUM_SERVOS; i++)
     servos[i].detach();
+  disableServos();
 
   blinds.attach(BLINDS);
+  enableBlinds();
   blinds.writeMicroseconds(blindsPos);
+  delay(INITIAL_SLEW);
+  disableBlinds();
 }
 
 void moveBlinds(int targetPos)
 {
+  if (blindsPos == targetPos)
+    return;
   if (targetPos == 900 && blindsPos != 900)
     moveBlinds(500);
-  //blinds.attach(BLINDS);
+  enableBlinds();
   bool dir = blindsPos < targetPos;
   for (int i = blindsPos; dir ? i <= targetPos : i >= targetPos; dir ? i++ : i--)
   {
@@ -79,36 +91,37 @@ void moveBlinds(int targetPos)
     delay(7);
   }
   blindsPos = targetPos;
-  //blinds.detach();
-  //digitalWrite(BLINDS, LOW);
+  disableBlinds();
 }
 
 void activateServo(Servos s)
 {
+  enableServos();
   servos[s].attach(info[s][PIN]);
   servos[s].write(info[s][ACTIVATED]);
   delay(info[s][SLEW]);
   servos[s].write(info[s][NORMAL]);
   delay(info[s][SLEW]);
   servos[s].detach();
+  disableServos();
 }
 
 void loop()
 {
   currentTime = millis();
 
-  if (currentTime - previousReset > servoResetInterval)
-  {
-    for (int i = 0; i < NUM_SERVOS; i++)
-    {
-      servos[i].attach(info[i][PIN]);
-      servos[i].write(info[i][NORMAL]);
-    }
-    delay(RESET_SLEW);
-    for (int i = 0; i < NUM_SERVOS; i++)
-      servos[i].detach();
-    previousReset = currentTime;
-  }
+//  if (currentTime - previousReset > servoResetInterval)
+//  {
+//    for (int i = 0; i < NUM_SERVOS; i++)
+//    {
+//      servos[i].attach(info[i][PIN]);
+//      servos[i].write(info[i][NORMAL]);
+//    }
+//    delay(RESET_SLEW);
+//    for (int i = 0; i < NUM_SERVOS; i++)
+//      servos[i].detach();
+//    previousReset = currentTime;
+//  }
 
   if (currentTime - previousRead > sensorReadInterval)
   {
@@ -144,10 +157,6 @@ void loop()
       activateServo(FON);
     if (command.equals("foff"))
       activateServo(FOFF);
-    if (command.equals("clon"))
-      activateServo(CLON);
-    if (command.equals("cloff"))
-      activateServo(CLOFF);
     if (command.equals("hlon"))
       digitalWrite(HL, HIGH);
     if (command.equals("hloff"))
