@@ -25,7 +25,7 @@ static constexpr int RESET_SLEW = 50;
 
 static constexpr int HL = 8;
 
-DHT spaceDHT(9, DHT11);
+DHT spaceDHT(9, DHT22);
 
 Servo blinds;
 static constexpr int BLINDS = 10;
@@ -130,8 +130,8 @@ void loop()
     if (isnan(spaceTemp) || isnan(spaceHum));
     else
     {
-      spaceTemp -= 2.5;
-      spaceHum -= 10;
+      //spaceTemp -= 2.5;
+      //spaceHum -= 10;
       Serial.print(spaceTemp); Serial.print(" "); Serial.println(spaceHum);
       previousRead = currentTime;
     }
