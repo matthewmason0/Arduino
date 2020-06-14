@@ -35,7 +35,7 @@ void setup()
     lightSwitchState = digitalRead(2);
     fanSwitchState = digitalRead(3);
 
-    command.reserve(8);
+    command.reserve(32);
 
 //    Serial.begin(9600);
 //    while (!Serial);
@@ -49,7 +49,6 @@ void loop()
     {
         if (lightSwitchReadCount == debounceThreshold)
         {
-//            Serial.print("registered light "); Serial.println(!light);
             lightSwitchReadCount = 0;
             lightSwitchState = !lightSwitchState;
             setLight(!light);
@@ -65,7 +64,6 @@ void loop()
     {
         if (fanSwitchReadCount == debounceThreshold)
         {
-//            Serial.print("registered fan "); Serial.println(!fan);
             fanSwitchReadCount = 0;
             fanSwitchState = !fanSwitchState;
             setFan(!fan, fanSpeed);
@@ -118,27 +116,29 @@ void send()
 void receive()
 {
     char c = 0;
-    while (c != '\n')
+    while (swSerial.available()) // read until newline encountered or buffer empty
     {
-        if (swSerial.available())
-        {
-            c = (char)swSerial.read();
-            command += c;
-        }
+        c = (char)swSerial.read();
+        if (c == '\n')
+            break;
+        command += c;
     }
-    command.trim();
-    Serial.println(command);
-    if (command.equals("lon"))
-        setLight(1);
-    else if (command.equals("loff"))
-        setLight(0);
-    else if (command.equals("fon"))
-        setFan(1, fanSpeed);
-    else if (command.equals("foff"))
-        setFan(0, fanSpeed);
-    else if (command.equals("flo"))
-        setFan(fan, 0);
-    else if (command.equals("fhi"))
-        setFan(fan, 1);
-    command = "";
+    if (c == '\n')
+    {
+        command.trim();
+        Serial.println(command);
+        if (command.equals("lon"))
+            setLight(1);
+        else if (command.equals("loff"))
+            setLight(0);
+        else if (command.equals("fon"))
+            setFan(1, fanSpeed);
+        else if (command.equals("foff"))
+            setFan(0, fanSpeed);
+        else if (command.equals("flo"))
+            setFan(fan, 0);
+        else if (command.equals("fhi"))
+            setFan(fan, 1);
+        command = "";
+    }
 }

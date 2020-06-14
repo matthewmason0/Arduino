@@ -11,7 +11,8 @@ DHT dht(9, DHT22);
 Servo blinds;
 static constexpr int BLINDS = 10;
 static constexpr int BLINDS_ENABLE = 11;
-int blindsPos = -1;
+int currentPos = -1;
+int targetPos = -1;
 void enableBlinds() { digitalWrite(BLINDS_ENABLE, HIGH); }
 void disableBlinds() { digitalWrite(BLINDS_ENABLE, LOW); }
 
@@ -19,11 +20,12 @@ unsigned long sensorReadInterval = 2000;
 unsigned long currentTime;
 unsigned long previousRead = 0;
 
-String command = "";
+String hbCommand = "";
+String swCommand = "";
 
-void moveBlinds(int percent);
+void moveBlinds();
 void readDHT();
-void receive();
+void receiveHomebridge();
 void receiveSwitches();
 
 void setup()
@@ -35,7 +37,8 @@ void setup()
     digitalWrite(BLINDS_ENABLE, LOW);
     digitalWrite(13, LOW);
 
-    command.reserve(16);
+    hbCommand.reserve(32);
+    swCommand.reserve(32);
 
     Serial.begin(9600);
     while (!Serial);
@@ -52,38 +55,45 @@ void loop()
 {
     currentTime = millis();
 
-    if (currentTime - previousRead > sensorReadInterval)
+    if (currentTime - previousRead > sensorReadInterval && currentPos == targetPos)
         readDHT();
 
     if (Serial.available())
-        receive();
+        receiveHomebridge();
     
     if (swSerial.available())
         receiveSwitches();
+    
+    moveBlinds();
 }
 
-void moveBlinds(int percent)
-{
-    int targetPos = percent * 12 + 900;
-    
-    if (blindsPos == -1)
-        blindsPos = targetPos;
-    
-    if (blindsPos == targetPos)
+void moveBlinds()
+{   
+    if (targetPos == -1) // target is unset
         return;
     
-    if (targetPos == 900 && blindsPos != 900)
-        moveBlinds(-33);
+    if (currentPos == -1) // initial update of currentPos
+        currentPos = targetPos;
     
-    enableBlinds();
-    bool dir = blindsPos < targetPos;
-    for (int i = blindsPos; dir ? i <= targetPos : i >= targetPos; dir ? i++ : i--)
+    if (currentPos == targetPos) // target reached
     {
-        blinds.writeMicroseconds(i);
-        delay(7);
+        disableBlinds();
+        return;
     }
-    blindsPos = targetPos;
-    disableBlinds();
+    
+    const bool dir = currentPos < targetPos;
+
+    currentPos += dir ? 1 : -1;
+
+    enableBlinds();
+    blinds.writeMicroseconds(currentPos);
+    delay(7);
+    
+    if (currentPos == 900 && !dir) // closing and reached 0%
+        targetPos = 500;
+
+    if (currentPos == 500 && !dir) // reached turnaround point
+        targetPos = 900;
 }
 
 void readDHT()
@@ -91,69 +101,72 @@ void readDHT()
     float temp = dht.readTemperature();
     float humidity = dht.readHumidity();
 
-    if (isnan(temp) || isnan(humidity));
-    else
+    if (!isnan(temp) && !isnan(humidity))
     {
         Serial.print("dht "); Serial.print(temp); Serial.print(" "); Serial.println(humidity);
         previousRead = currentTime;
     }
 }
 
-void receive()
+void receiveHomebridge()
 {
     char c = 0;
-    while (c != '\n')
+    while (Serial.available()) // read until newline encountered or buffer empty
     {
-        if (Serial.available())
-        {
-            c = (char)Serial.read();
-            command += c;
-        }
+        c = (char)Serial.read();
+        if (c == '\n')
+            break;
+        hbCommand += c;
     }
-    command.trim();
-    if (command.equals("mlon"))
-        swSerial.println("lon");
-    else if (command.equals("mloff"))
-        swSerial.println("loff");
-    else if (command.equals("fon"))
-        swSerial.println("fon");
-    else if (command.equals("foff"))
-        swSerial.println("foff");
-    else if (command.equals("fhi"))
-        swSerial.println("fhi");
-    else if (command.equals("flo"))
-        swSerial.println("flo");
-    else if (command.equals("hlon"))
-        digitalWrite(HL, 1);
-    else if (command.equals("hloff"))
-        digitalWrite(HL, 0);
-    else
+    if (c == '\n')
     {
-        int index = command.indexOf('b');
-        if (index != -1)
+        hbCommand.trim();
+        if (hbCommand.equals("mlon"))
+            swSerial.println("lon");
+        else if (hbCommand.equals("mloff"))
+            swSerial.println("loff");
+        else if (hbCommand.equals("fon"))
+            swSerial.println("fon");
+        else if (hbCommand.equals("foff"))
+            swSerial.println("foff");
+        else if (hbCommand.equals("fhi"))
+            swSerial.println("fhi");
+        else if (hbCommand.equals("flo"))
+            swSerial.println("flo");
+        else if (hbCommand.equals("hlon"))
+            digitalWrite(HL, 1);
+        else if (hbCommand.equals("hloff"))
+            digitalWrite(HL, 0);
+        else
         {
-            int percent = command.substring(index + 1).toInt();
-            moveBlinds(percent);
+            int index = hbCommand.indexOf('b');
+            if (index != -1)
+            {
+                int percent = hbCommand.substring(index + 1).toInt();
+                targetPos = percent * 12 + 900;
+            }
         }
+        hbCommand = "";
     }
-    command = "";
 }
 
 void receiveSwitches()
 {
     char c = 0;
-    while (c != '\n')
+    while (swSerial.available()) // read until newline encountered or buffer empty
     {
-        if (swSerial.available())
-        {
-            c = (char)swSerial.read();
-            command += c;
-        }
+        c = (char)swSerial.read();
+        if (c == '\n')
+            break;
+        swCommand += c;
     }
-    command.trim();
-    if (command.equals("?"))
-        Serial.println("?");
-    else if (command.length() == 3)
-        Serial.println("sw " + command);
-    command = "";
+    if (c == '\n')
+    {
+        swCommand.trim();
+        if (swCommand.equals("?"))
+            Serial.println("?");
+        else if (swCommand.length() == 3)
+            Serial.println("sw " + swCommand);
+        swCommand = "";
+    }
 }
