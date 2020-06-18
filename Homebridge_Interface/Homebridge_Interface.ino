@@ -1,22 +1,23 @@
-#include <SoftwareSerial.h>
-#include <Servo.h>
+#include <AltSoftSerial.h>
+#include <ServoTimer2.h>
 #include <DHT.h>
 
-SoftwareSerial swSerial(2, 3);
+AltSoftSerial swSerial; // 8, 9
 
-static constexpr int HL = 8;
+DHT dht(2, DHT22);
+static constexpr int DHT_ENABLE = 3;
 
-DHT dht(9, DHT22);
+static constexpr int HL = 12;
 
-Servo blinds;
-static constexpr int BLINDS = 10;
-static constexpr int BLINDS_ENABLE = 11;
+ServoTimer2 blinds;
+static constexpr int BLINDS = 4;
+static constexpr int BLINDS_ENABLE = 5;
 int currentPos = -1;
 int targetPos = -1;
-void enableBlinds() { digitalWrite(BLINDS_ENABLE, HIGH); }
-void disableBlinds() { digitalWrite(BLINDS_ENABLE, LOW); }
+void enableBlinds() { digitalWrite(BLINDS_ENABLE, 1); }
+void disableBlinds() { digitalWrite(BLINDS_ENABLE, 0); }
 
-unsigned long sensorReadInterval = 2000;
+unsigned long sensorReadInterval = 5000;
 unsigned long currentTime;
 unsigned long previousRead = 0;
 
@@ -30,12 +31,14 @@ void receiveSwitches();
 
 void setup()
 {
-    pinMode(HL, OUTPUT);
+    pinMode(DHT_ENABLE, OUTPUT);
     pinMode(BLINDS_ENABLE, OUTPUT);
+    pinMode(HL, OUTPUT);
     pinMode(13, OUTPUT);
-    digitalWrite(HL, LOW);
-    digitalWrite(BLINDS_ENABLE, LOW);
-    digitalWrite(13, LOW);
+    digitalWrite(DHT_ENABLE, 1);
+    digitalWrite(BLINDS_ENABLE, 0);
+    digitalWrite(HL, 0);
+    digitalWrite(13, 0);
 
     hbCommand.reserve(32);
     swCommand.reserve(32);
@@ -86,13 +89,13 @@ void moveBlinds()
     currentPos += dir ? 1 : -1;
 
     enableBlinds();
-    blinds.writeMicroseconds(currentPos);
+    blinds.write(currentPos);
     delay(7);
     
     if (currentPos == 900 && !dir) // closing and reached 0%
-        targetPos = 500;
+        targetPos = 800;
 
-    if (currentPos == 500 && !dir) // reached turnaround point
+    if (currentPos == 800 && !dir) // reached turnaround point
         targetPos = 900;
 }
 
@@ -121,6 +124,7 @@ void receiveHomebridge()
     if (c == '\n')
     {
         hbCommand.trim();
+//        Serial.print("###"); Serial.println(hbCommand);
         if (hbCommand.equals("mlon"))
             swSerial.println("lon");
         else if (hbCommand.equals("mloff"))

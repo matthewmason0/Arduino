@@ -1,7 +1,7 @@
 ARDUINO_DIR = /usr/share/arduino
 ARDUINO_PORT = /dev/ttyACM*
 
-ARDUINO_LIBS = SoftwareSerial Servo DHT Adafruit_Unified_Sensor
+ARDUINO_LIBS = AltSoftSerial ServoTimer2 DHT Adafruit_Unified_Sensor
 
 USER_LIB_PATH = /home/pi/Arduino/libraries
 BOARD_TAG = uno
