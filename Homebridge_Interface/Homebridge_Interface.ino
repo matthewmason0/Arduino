@@ -138,9 +138,15 @@ void receiveHomebridge()
         else if (hbCommand.equals("flo"))
             swSerial.println("flo");
         else if (hbCommand.equals("hlon"))
+        {
             digitalWrite(HL, 1);
+            swSerial.println("nlon");
+        }
         else if (hbCommand.equals("hloff"))
+        {
             digitalWrite(HL, 0);
+            swSerial.println("nloff");
+        }
         else if (hbCommand.equals("nmon"))
             swSerial.println("nmon");
         else if (hbCommand.equals("nmoff"))
