@@ -137,6 +137,10 @@ void receiveHomebridge()
             digitalWrite(HL, 1);
         else if (hbCommand.equals("hloff"))
             digitalWrite(HL, 0);
+        else if (hbCommand.equals("nmon"))
+            swSerial.println("nmon");
+        else if (hbCommand.equals("nmoff"))
+            swSerial.println("nmoff");
         else
         {
             int index = hbCommand.indexOf('b');
@@ -165,8 +169,12 @@ void receiveSwitches()
         swCommand.trim();
         if (swCommand.equals("?"))
             Serial.println("?");
-        else if (swCommand.length() == 3)
+        else if (swCommand.length() == 4)
+        {
             Serial.println("sw " + swCommand);
+            int hl = swCommand[1] - '0';
+            digitalWrite(HL, hl);
+        }
         swCommand = "";
     }
 }
