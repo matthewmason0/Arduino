@@ -3,14 +3,19 @@
 SoftwareSerial swSerial(5, 6);
 
 bool light = false;
+bool nightLight = false;
 bool fan = false;
 bool fanSpeed = true;
+bool nightMode = false;
 
 static constexpr int debounceThreshold = 5;
 bool lightSwitchState;
 bool fanSwitchState;
 int lightSwitchReadCount = 0;
 int fanSwitchReadCount = 0;
+
+unsigned long nightModeOverrideInterval = 1000;
+unsigned long nightModeOverrideLastOn = 0;
 
 String command = "";
 
@@ -29,7 +34,7 @@ void setup()
     pinMode(13, OUTPUT);
     digitalWrite(13, 0);
 
-    setLight(light);
+    setLight(light, nightLight, nightMode);
     setFan(fan, fanSpeed);
 
     lightSwitchState = digitalRead(2);
@@ -51,7 +56,7 @@ void loop()
         {
             lightSwitchReadCount = 0;
             lightSwitchState = !lightSwitchState;
-            setLight(!light);
+            setLight(!light, !nightLight, nightMode);
             send();
         }
         else
@@ -79,10 +84,26 @@ void loop()
         receive();
 }
 
-void setLight(bool state)
+void setLight(bool state, bool nightState, bool nightMode)
 {
-    digitalWrite(9, state);
-    light = state;
+    if (nightMode && nightState && (millis() - nightModeOverrideLastOn < nightModeOverrideInterval))
+        nightMode = false;
+
+    if (nightMode && !light)
+    {
+        if (nightState)
+            nightModeOverrideLastOn = millis();
+
+        nightLight = nightState;
+
+        digitalWrite(9, 0);
+        light = false;
+    }
+    else
+    {
+        digitalWrite(9, state);
+        light = state;
+    }
 }
 
 void setFan(bool state, bool speed)
@@ -109,6 +130,7 @@ void setFan(bool state, bool speed)
 void send()
 {
     swSerial.print(light);
+    swSerial.print(nightLight);
     swSerial.print(fan);
     swSerial.println(fanSpeed);
 }
@@ -128,9 +150,13 @@ void receive()
         command.trim();
         Serial.println(command);
         if (command.equals("lon"))
-            setLight(1);
+            setLight(1, 0, 0);
         else if (command.equals("loff"))
-            setLight(0);
+            setLight(0, 0, 0);
+        else if (command.equals("nlon"))
+            nightLight = true;
+        else if (command.equals("nloff"))
+            nightLight = false;
         else if (command.equals("fon"))
             setFan(1, fanSpeed);
         else if (command.equals("foff"))
@@ -139,6 +165,10 @@ void receive()
             setFan(fan, 0);
         else if (command.equals("fhi"))
             setFan(fan, 1);
+        else if (command.equals("nmon"))
+            nightMode = true;
+        else if (command.equals("nmoff"))
+            nightMode = false;
         command = "";
     }
 }
