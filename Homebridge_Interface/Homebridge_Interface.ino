@@ -7,6 +7,9 @@ AltSoftSerial swSerial; // 8, 9
 DHT dht(2, DHT22);
 static constexpr int DHT_ENABLE = 3;
 
+static constexpr int CS_ENABLE = 10;
+static constexpr int CS = 11;
+
 static constexpr int HL = 12;
 
 ServoTimer2 blinds;
@@ -21,11 +24,16 @@ unsigned long sensorReadInterval = 5000;
 unsigned long currentTime;
 unsigned long previousRead = 0;
 
+static constexpr int debounceThreshold = 10;
+int csReadCount = 0;
+bool csState;
+
 String hbCommand = "";
 String swCommand = "";
 
 void moveBlinds();
 void readDHT();
+void checkContactSensor();
 void receiveHomebridge();
 void receiveSwitches();
 
@@ -33,10 +41,13 @@ void setup()
 {
     pinMode(DHT_ENABLE, OUTPUT);
     pinMode(BLINDS_ENABLE, OUTPUT);
+    pinMode(CS_ENABLE, OUTPUT);
+    pinMode(CS, INPUT);
     pinMode(HL, OUTPUT);
     pinMode(13, OUTPUT);
     digitalWrite(DHT_ENABLE, 1);
     digitalWrite(BLINDS_ENABLE, 0);
+    digitalWrite(CS_ENABLE, 1);
     digitalWrite(HL, 0);
     digitalWrite(13, 0);
 
@@ -52,6 +63,8 @@ void setup()
     dht.begin();
 
     blinds.attach(BLINDS);
+
+    csState = digitalRead(CS);
 }
 
 void loop()
@@ -68,6 +81,8 @@ void loop()
         receiveSwitches();
     
     moveBlinds();
+
+    checkContactSensor();
 }
 
 void moveBlinds()
@@ -109,6 +124,24 @@ void readDHT()
         Serial.print("dht "); Serial.print(temp); Serial.print(" "); Serial.println(humidity);
         previousRead = currentTime;
     }
+}
+
+void checkContactSensor()
+{
+    if (csState != digitalRead(CS))
+    {
+        if (csReadCount == debounceThreshold)
+        {
+            csReadCount = 0;
+            csState = !csState;
+            Serial.print("cs");
+            Serial.println(csState);
+        }
+        else
+            csReadCount++;
+    }
+    else
+        csReadCount = 0;
 }
 
 void receiveHomebridge()
