@@ -134,8 +134,7 @@ void checkContactSensor()
         {
             csReadCount = 0;
             csState = !csState;
-            Serial.print("cs");
-            Serial.println(csState);
+            Serial.print("cs "); Serial.println(csState);
         }
         else
             csReadCount++;
