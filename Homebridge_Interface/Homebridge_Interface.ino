@@ -124,6 +124,10 @@ void readDHT()
         Serial.print("dht "); Serial.print(temp); Serial.print(" "); Serial.println(humidity);
         previousRead = currentTime;
     }
+
+    digitalWrite(DHT_ENABLE, 0);
+    delay(5);
+    digitalWrite(DHT_ENABLE, 1);
 }
 
 void checkContactSensor()
