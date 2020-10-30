@@ -5,10 +5,11 @@
 AltSoftSerial swSerial; // 8, 9
 
 DHT dht(2, DHT22);
-static constexpr int DHT_ENABLE = 3;
+static constexpr int DHT_ENABLE = 6;
 
 static constexpr int CS_ENABLE = 10;
 static constexpr int CS = 11;
+static constexpr int EB = 3;
 
 static constexpr int HL = 12;
 
@@ -27,6 +28,8 @@ unsigned long previousRead = 0;
 static constexpr int debounceThreshold = 10;
 int csReadCount = 0;
 bool csState;
+static constexpr int ebDebounceThreshold = 1000;
+volatile bool ebPressed = false;
 
 String hbCommand = "";
 String swCommand = "";
@@ -34,6 +37,8 @@ String swCommand = "";
 void moveBlinds();
 void readDHT();
 void checkContactSensor();
+void checkExitButton();
+void onExitButton();
 void receiveHomebridge();
 void receiveSwitches();
 
@@ -43,6 +48,7 @@ void setup()
     pinMode(BLINDS_ENABLE, OUTPUT);
     pinMode(CS_ENABLE, OUTPUT);
     pinMode(CS, INPUT);
+    pinMode(EB, INPUT);
     pinMode(HL, OUTPUT);
     pinMode(13, OUTPUT);
     digitalWrite(DHT_ENABLE, 1);
@@ -65,6 +71,7 @@ void setup()
     blinds.attach(BLINDS);
 
     csState = digitalRead(CS);
+    attachInterrupt(digitalPinToInterrupt(EB), onExitButton, RISING);
 }
 
 void loop()
@@ -83,6 +90,7 @@ void loop()
     moveBlinds();
 
     checkContactSensor();
+    checkExitButton();
 }
 
 void moveBlinds()
@@ -122,12 +130,14 @@ void readDHT()
     if (!isnan(temp) && !isnan(humidity))
     {
         Serial.print("dht "); Serial.print(temp); Serial.print(" "); Serial.println(humidity);
-        previousRead = currentTime;
     }
-
-    digitalWrite(DHT_ENABLE, 0);
-    delay(5);
-    digitalWrite(DHT_ENABLE, 1);
+    else
+    {
+        digitalWrite(DHT_ENABLE, 0);
+        delay(500);
+        digitalWrite(DHT_ENABLE, 1);
+    }
+    previousRead = currentTime;
 }
 
 void checkContactSensor()
@@ -145,6 +155,28 @@ void checkContactSensor()
     }
     else
         csReadCount = 0;
+}
+
+void checkExitButton()
+{
+    if (ebPressed)
+    {
+        ebPressed = false;
+        Serial.println("eb");
+    }
+}
+
+void onExitButton()
+{
+    for (int i = 0; digitalRead(EB); i++)
+    {
+        if (i > ebDebounceThreshold)
+        {
+            ebPressed = true;
+            return;
+        }
+        delayMicroseconds(5);
+    }
 }
 
 void receiveHomebridge()
