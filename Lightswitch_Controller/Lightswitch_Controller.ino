@@ -8,7 +8,7 @@ bool fan = false;
 bool fanSpeed = true;
 bool nightMode = false;
 
-static constexpr int debounceThreshold = 5;
+static constexpr int debounceThreshold = 10;
 bool lightSwitchState;
 bool fanSwitchState;
 int lightSwitchReadCount = 0;
