@@ -31,7 +31,6 @@ void setup()
     Serial.print("lab_1 by Matt Mason");
     printPrompt();
 }
-
 bool blinking = false;
 void loop()
 {
