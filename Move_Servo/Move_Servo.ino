@@ -4,55 +4,50 @@ Servo s;
 
 String input = "";
 
+bool run = false;
+int step = 100;
+float val = 800.0f;
+int dir = 1;
+
 void setup()
 {
   for (int i = 2; i <= 10; i++)
     pinMode(i, OUTPUT);
+  for (int i = 2; i <= 10; i++)
+    digitalWrite(i, LOW);
   Serial.begin(9600);
+  s.attach(6);
 }
 
 void loop()
 {
-  for (int i = 2; i <= 10; i++)
-    digitalWrite(i, LOW);
-  bool init = true;
-  while (init)
+  while (Serial.available())
   {
-    while (Serial.available())
+    char c = Serial.read();
+    if (c == '\n')
     {
-      char c = Serial.read();
-      if (c == '\n')
-      {
-        s.attach(input.toInt());
-        init = false;
-        input = "";
-      }
-      else
-        input += c;
+      int i = input.toInt();
+      if (i > 0)
+        step = i;
+      // s.writeMicroseconds(input.toInt());
+      input = "";
     }
-    delay(1);
+    else if (c == 'q')
+      run = !run;
+    else
+      input += c;
   }
-  bool run = true;
-  while (run)
+  if (run)
   {
-    while (Serial.available())
-    {
-      char c = Serial.read();
-      if (c == '\n')
-      {
-        s.writeMicroseconds(input.toInt());
-        input = "";
-      }
-      else if (c == 'q')
-      {
-        run = false;
-        break;
-      }
-      else
-        input += c;
-    }
-    delay(1);
+    if (val >= 1800)
+      dir = -1;
+    else if (val <= 800)
+      dir = 1;
+    val += 10.0f / step * dir;
+    // Serial.print(val); Serial.print(" "); Serial.print(step); Serial.print(" "); Serial.println(dir);
+    s.writeMicroseconds((int)val);
   }
-  s.detach();
-  input = "";
+  // else
+    // s.writeMicroseconds(900);
+  delay(1);
 }

@@ -1,0 +1,23 @@
+#pragma once
+#include <Adafruit_GFX.h>
+
+const uint8_t RXTXBitmaps[] PROGMEM = {
+  0xFE, 0x21, 0x90, 0x48, 0x24, 0x23, 0xE1, 0x10, 0x84, 0x41, 0x70, 0xC0, 
+  0xFF, 0xC4, 0x62, 0x21, 0x00, 0x80, 0x40, 0x20, 0x10, 0x08, 0x1F, 0x00, 
+  0xE3, 0xA0, 0x88, 0x82, 0x80, 0x80, 0x40, 0x50, 0x44, 0x41, 0x71, 0xC0 
+};
+
+const GFXglyph RXTXGlyphs[] PROGMEM = {
+  {     0,   9,  10,  11,    1,   -9 },   // 0x52 'R'
+  {     0,   0,   0,   0,    0,    0 },   // 0x53 'S'
+  {    12,   9,  10,  11,    1,   -9 },   // 0x54 'T'
+  {     0,   0,   0,   0,    0,    0 },   // 0x55 'U'
+  {     0,   0,   0,   0,    0,    0 },   // 0x56 'V'
+  {     0,   0,   0,   0,    0,    0 },   // 0x57 'W'
+  {    24,   9,  10,  11,    1,   -9 }    // 0x58 'X'
+};
+
+const GFXfont RXTX PROGMEM = {(uint8_t *)RXTXBitmaps, 
+                                       (GFXglyph *)RXTXGlyphs, 0x52, 0x58,  18};
+
+// Approx. 1516 bytes
