@@ -31,6 +31,12 @@ static constexpr uint8_t ZERO = 0x80; // substitute for 0 value
 
 static constexpr uint8_t PASSWORD = 0xDB; // 11011011
 
+// Text Symbols
+static constexpr uint8_t COLON   = ':';
+static constexpr uint8_t DASH    = '-';
+static constexpr uint8_t PERCENT = '%';
+static constexpr uint8_t SPACE   = ' ';
+
 static constexpr uint32_t DISCOVERY_PERIOD = 2000; // ms
 static constexpr uint32_t SYNC_PERIOD = 3000;
 uint32_t _syncTimer = 0;
@@ -41,9 +47,23 @@ uint32_t _syncTimer = 0;
 static constexpr uint8_t MAX_RETRIES = 10;
 uint8_t _retries = 0;
 
+static constexpr uint32_t ICON_FLASH_TIME = 500; // ms
+uint32_t _txIconTimer = 0;
+uint32_t _rxIconTimer = 0;
+
+enum class EngineState
+{
+    OFF = 0,
+    STARTING = 1,
+    RUNNING = 2
+};
+
 void displayRetries();
 
-void displayReceiverValues(uint8_t batt, uint16_t engTime, uint8_t engState);
+void drawBattery(uint8_t x, uint8_t y, int8_t batt);
+
+void clearReceiverValues();
+void displayReceiverValues(uint8_t batt, uint16_t engTime, EngineState engState);
 
 void displayTxIcon();
 void displayRxIcon();
@@ -111,23 +131,25 @@ void _requestState_WAITING_FOR_REPLY()
     _requestState = RequestState::WAITING_FOR_REPLY;
 }
 
-enum class TransmitterState
-{
-    CONNECTING,
-    CONNECTED
-};
-TransmitterState _state = TransmitterState::CONNECTING;
-void _state_CONNECTING()
-{
-    println(F("_state CONNECTING"));
-    _state = TransmitterState::CONNECTING;
-}
-void _state_CONNECTED()
-{
-    println(F("_state CONNECTED"));
-    _activeRequest_ENQ();
-    _state = TransmitterState::CONNECTED;
-}
+// enum class TransmitterState
+// {
+//     CONNECTING,
+//     CONNECTED
+// };
+// TransmitterState _state = TransmitterState::CONNECTING;
+// void _state_CONNECTING()
+// {
+//     println(F("_state CONNECTING"));
+//     _state = TransmitterState::CONNECTING;
+// }
+// void _state_CONNECTED()
+// {
+//     println(F("_state CONNECTED"));
+//     _activeRequest_ENQ();
+//     _state = TransmitterState::CONNECTED;
+// }
+
+void _syncState_DISCOVERY(const uint32_t syncTime);
 
 void tx()
 {
@@ -138,7 +160,8 @@ void tx()
         {
             _requestState_IDLE();
             _activeRequest_NONE();
-            _state_CONNECTING();
+            // _state_CONNECTING();
+            _syncState_DISCOVERY(millis());
             return;
         }
         displayRetries();
@@ -184,6 +207,7 @@ void _syncState_DISCOVERY(const uint32_t syncTime)
 {
     check_mem();
     hc12.write(SOH);
+    displayTxIcon();
     println(F("_syncState DISCOVERY"));
     // _txBuffer[0] = 0;
     _syncTimer = syncTime;
@@ -191,6 +215,11 @@ void _syncState_DISCOVERY(const uint32_t syncTime)
 }
 void _syncState_SYNCED(const uint32_t syncTime)
 {
+    if (_syncState != SyncState::SYNCED)
+    {
+        println(F("_syncState SYNCED"));
+        _activeRequest_ENQ();
+    }
     // if (_txBuffer[0])
     // {
     //     hc12.write(_txBuffer);
@@ -224,12 +253,5 @@ void updateSync(const uint32_t now)
         }
     }
 }
-
-enum class EngineState
-{
-    OFF = 0,
-    STARTING = 1,
-    RUNNING = 2
-};
 
 #endif // TRANSMITTER_V2_H
