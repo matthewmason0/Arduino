@@ -114,6 +114,7 @@ void step(const uint32_t now, const uint8_t msg)
     // }
     updateSync(now);
     updateIcons(now);
+    updateEngineTime(now);
 }
 
 // non-blocking message processing
@@ -121,7 +122,6 @@ void processMessage(const uint32_t now, const uint8_t msg)
 {
     static uint8_t rxBatt = 0;
     static uint16_t engTime = 0;
-    static uint8_t engState = 0;
     switch (_activeRequest)
     {
         case ActiveRequest::NONE:
@@ -134,6 +134,7 @@ void processMessage(const uint32_t now, const uint8_t msg)
         }
         case ActiveRequest::ENQ1:
         {
+            // msg -> lower 7 bits of engTime
             engTime = msg;
             _activeRequest_ENQ2();
             break;
@@ -142,9 +143,11 @@ void processMessage(const uint32_t now, const uint8_t msg)
         {
             // lower 5 bits of msg -> upper 5 bits of engTime (12 bits total)
             engTime |= (uint16_t)(msg & 0x1F) << 7;
+            _engTime = engTime;
+            _lastEngTimeUpdate = now;
             // upper 2 bits of msg -> engState
-            engState = msg >> 5;
-            displayReceiverValues(rxBatt, engTime, (EngineState)engState);
+            _engState = (EngineState)(msg >> 5);
+            displayReceiverValues(rxBatt, _engTime, _engState);
             _requestState_IDLE();
             _activeRequest_ENQ();
             break;
@@ -221,6 +224,24 @@ void drawBattery(const uint8_t x, const uint8_t y, const int8_t batt)
         display.write(SPACE);
 }
 
+void drawEngineTime()
+{
+    // update text @ (19, 85) 44x13
+    uint8_t mins = _engTime / 60;
+    uint8_t secs = _engTime % 60;
+    display.fillRect(19, 85, 44, 13, 0);
+    display.setFont(&NumericMono);
+    display.setCursor(19, 85+12);
+    if (mins < 10)
+        display.write('0');
+    display.print(mins);
+    display.write(COLON);
+    if (secs < 10)
+        display.write('0');
+    display.print(secs);
+    display.setFont();
+}
+
 void clearReceiverValues()
 {
     drawBattery(32, 34, -1);
@@ -231,10 +252,10 @@ void clearReceiverValues()
     display.write(DASH);
     display.write(DASH);
     display.write(SPACE);
-    // clear text @ (19, 84) 44x13
-    display.fillRect(19, 84, 44, 13, 0);
+    // clear text @ (19, 85) 44x13
+    display.fillRect(19, 85, 44, 13, 0);
     display.setFont(&NumericMono);
-    display.setCursor(19, 84+13);
+    display.setCursor(19, 85+12);
     display.write(DASH);
     display.write(DASH);
     display.write(COLON);
@@ -263,13 +284,22 @@ void displayReceiverValues(const uint8_t batt, const uint16_t engTime, const Eng
             display.print(F(" RUN "));
             break;
     }
-    // update text @ (19, 84) 44x13
-    display.fillRect(19, 84, 44, 13, 0);
-    display.setFont(&NumericMono);
-    display.setCursor(19, 84+13);
-    display.print(F("25:68"));
-    display.setFont();
+    drawEngineTime();
     display.display();
+}
+
+void updateEngineTime(const uint32_t now)
+{
+    if (_engState == EngineState::RUNNING)
+    {
+        if ((now - _lastEngTimeUpdate) >= 1000)
+        {
+            _engTime += 1;
+            _lastEngTimeUpdate = now;
+            drawEngineTime();
+            display.display();
+        }
+    }
 }
 
 void displayTxIcon()

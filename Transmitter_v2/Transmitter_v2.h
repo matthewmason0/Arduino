@@ -47,9 +47,8 @@ uint32_t _syncTimer = 0;
 static constexpr uint8_t MAX_RETRIES = 10;
 uint8_t _retries = 0;
 
-static constexpr uint32_t ICON_FLASH_TIME = 500; // ms
-uint32_t _txIconTimer = 0;
-uint32_t _rxIconTimer = 0;
+uint16_t _engTime = 0;
+uint32_t _lastEngTimeUpdate = 0;
 
 enum class EngineState
 {
@@ -57,13 +56,20 @@ enum class EngineState
     STARTING = 1,
     RUNNING = 2
 };
+EngineState _engState = EngineState::OFF;
+
+static constexpr uint32_t ICON_FLASH_TIME = 500; // ms
+uint32_t _txIconTimer = 0;
+uint32_t _rxIconTimer = 0;
 
 void displayRetries();
 
 void drawBattery(uint8_t x, uint8_t y, int8_t batt);
+void drawEngineTime();
 
 void clearReceiverValues();
 void displayReceiverValues(uint8_t batt, uint16_t engTime, EngineState engState);
+void updateEngineTime(uint32_t now);
 
 void displayTxIcon();
 void displayRxIcon();
