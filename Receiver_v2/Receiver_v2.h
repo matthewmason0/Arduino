@@ -28,6 +28,7 @@ static constexpr uint32_t IGN_DEBOUNCE_TIME = 500; // ms
 
 static constexpr uint32_t CONNECTION_TIMEOUT = 10000; // ms
 uint32_t _connectionTimer = 0;
+uint32_t _sessionTimer = 0;
 
 static constexpr uint32_t SYNC_PERIOD = 3000; // ms
 static constexpr uint32_t SYNC_OFFSET = SYNC_PERIOD / 2;
@@ -134,8 +135,8 @@ void _syncState_SYNCED(const uint32_t syncTime)
     {
         for (size_t i = 0; _txBuffer[i]; i++)
             hc12.write((_txBuffer[i] == (char)ZERO) ? 0 : _txBuffer[i]);
-        print("sent ");
-        printTxBuffer();
+        // print("sent ");
+        // printTxBuffer();
         _txBuffer[0] = 0;
     }
     println("sync");
@@ -266,8 +267,8 @@ void tx(const char c)
         _txBuffer[i] = c ? c : ZERO;
         _txBuffer[i + 1] = 0;
     }
-    print("_txBuffer: ");
-    printTxBuffer();
+    // print("_txBuffer: ");
+    // printTxBuffer();
 }
 
 void updateSync(const uint32_t now)

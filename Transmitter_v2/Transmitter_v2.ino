@@ -94,8 +94,14 @@ void loop()
 void step(const uint32_t now, const uint8_t msg)
 {
     if (_syncState == SyncState::DISCOVERY && msg == ACK)
+    {
         _syncState_SYNCED(_syncTimer - DISCOVERY_PERIOD); // response corresponds to the PREVIOUS discovery TX
-    if (msg && _requestState == RequestState::WAITING_FOR_REPLY)
+        updateSync(now);
+        _requestState_IDLE();
+        _activeRequest_ENQ();
+
+    }
+    else if (msg && _requestState == RequestState::WAITING_FOR_REPLY)
         processMessage(now, (msg == ZERO) ? 0 : msg);
     else if (msg)
         println(F("message ignored"));
@@ -113,7 +119,7 @@ void step(const uint32_t now, const uint8_t msg)
     //     }
     // }
     updateSync(now);
-    updateIcons(now);
+    updateIcons();
     updateEngineTime(now);
 }
 
@@ -304,28 +310,39 @@ void updateEngineTime(const uint32_t now)
 
 void displayTxIcon()
 {
+    if (!_txIconActive)
+    {
+        display.drawBitmap(8, 13, TX_ICON, 9, 5, 1);
+        display.display();
+        _txIconActive = true;
+    }
     _txIconTimer = millis();
-    display.drawBitmap(8, 13, TX_ICON, 9, 5, 1);
-    display.display();
 }
 
 void displayRxIcon()
 {
+    if (!_rxIconActive)
+    {
+        display.drawBitmap(8, 25, RX_ICON, 9, 5, 1);
+        display.display();
+        _rxIconActive = true;
+    }
     _rxIconTimer = millis();
-    display.drawBitmap(8, 25, RX_ICON, 9, 5, 1);
-    display.display();
 }
 
-void updateIcons(const uint32_t now)
+void updateIcons()
 {
-    if ((now - _txIconTimer) >= ICON_FLASH_TIME)
+    const uint32_t now = millis();
+    if (_txIconActive && (now - _txIconTimer) >= ICON_FLASH_TIME)
     {
         display.fillRect(8, 13, 9, 5, 0);
         display.display();
+        _txIconActive = false;
     }
-    if ((now - _rxIconTimer) >= ICON_FLASH_TIME)
+    if (_rxIconActive && (now - _rxIconTimer) >= ICON_FLASH_TIME)
     {
         display.fillRect(8, 25, 9, 5, 0);
         display.display();
+        _rxIconActive = false;
     }
 }

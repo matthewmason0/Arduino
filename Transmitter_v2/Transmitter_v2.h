@@ -61,6 +61,8 @@ EngineState _engState = EngineState::OFF;
 static constexpr uint32_t ICON_FLASH_TIME = 500; // ms
 uint32_t _txIconTimer = 0;
 uint32_t _rxIconTimer = 0;
+bool _txIconActive = false;
+bool _rxIconActive = false;
 
 void displayRetries();
 
@@ -157,6 +159,7 @@ void _requestState_WAITING_FOR_REPLY()
 
 void _syncState_DISCOVERY(const uint32_t syncTime);
 
+// runs once per tx window, when synced
 void tx()
 {
     if (_requestState == RequestState::WAITING_FOR_REPLY)
@@ -164,16 +167,14 @@ void tx()
         _retries++;
         if (_retries > MAX_RETRIES)
         {
-            _requestState_IDLE();
-            _activeRequest_NONE();
             // _state_CONNECTING();
             _syncState_DISCOVERY(millis());
+            _requestState_IDLE();
+            _activeRequest_NONE();
             return;
         }
         displayRetries();
     }
-    if (_activeRequest != ActiveRequest::NONE)
-        displayTxIcon();
     switch (_activeRequest)
     {
         case ActiveRequest::NONE:
@@ -201,6 +202,8 @@ void tx()
             break;
         }
     }
+    if (_activeRequest != ActiveRequest::NONE)
+        displayTxIcon();
 }
 
 enum class SyncState
@@ -211,20 +214,23 @@ enum class SyncState
 SyncState _syncState = SyncState::DISCOVERY;
 void _syncState_DISCOVERY(const uint32_t syncTime)
 {
-    check_mem();
     hc12.write(SOH);
+    check_mem();
     displayTxIcon();
-    println(F("_syncState DISCOVERY"));
     // _txBuffer[0] = 0;
+    if (_syncState != SyncState::DISCOVERY)
+    {
+        println(F("_syncState DISCOVERY"));
+        _syncState = SyncState::DISCOVERY;
+    }
     _syncTimer = syncTime;
-    _syncState = SyncState::DISCOVERY;
 }
 void _syncState_SYNCED(const uint32_t syncTime)
 {
     if (_syncState != SyncState::SYNCED)
     {
         println(F("_syncState SYNCED"));
-        _activeRequest_ENQ();
+        _syncState = SyncState::SYNCED;
     }
     // if (_txBuffer[0])
     // {
@@ -236,7 +242,6 @@ void _syncState_SYNCED(const uint32_t syncTime)
     tx();
     println(F("sync"));
     _syncTimer = syncTime;
-    _syncState = SyncState::SYNCED;
 }
 
 void updateSync(const uint32_t now)

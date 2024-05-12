@@ -41,7 +41,8 @@ bool step(const uint32_t now, const uint8_t msg)
     if (msg)
     {
         processMessage(now, msg);
-        _state_CONNECTED(now);
+        if (_syncState == SyncState::SYNCED)
+            _state_CONNECTED(now);
     }
     updateEngine(now);
     bool blocked = false;
@@ -86,10 +87,11 @@ bool step(const uint32_t now, const uint8_t msg)
 void processMessage(const uint32_t now, const uint8_t msg)
 {
     // println("processMessage(", now, ", ", msg, ")");
-    println("_connectionTimer: ", (now - _connectionTimer));
-    if (msg == SOH && (now - _connectionTimer) > SYNC_PERIOD)
+    println("_sessionTimer: ", (now - _sessionTimer));
+    if (msg == SOH && (now - _sessionTimer) > SYNC_PERIOD)
     {
         tx(ACK);
+        _sessionTimer = now;
         // immediately sends response, then aligns to sync
         _syncState_SYNCED(millis() - SYNC_DELAY);
         return;
@@ -113,7 +115,7 @@ void processMessage(const uint32_t now, const uint8_t msg)
             uint8_t batt = measureBattery();
             uint16_t time = getEngineTime(now);
             uint8_t state = (uint8_t)_engState;
-            println("batt: ", batt, " time: ", time, " state: ", state);
+            // println("batt: ", batt, " time: ", time, " state: ", state);
             tx(batt);
             tx((uint8_t)(time & 0x7F)); // lower 7 bits of time
             tx((state << 5) | (uint8_t)(time >> 7)); // state | upper 5 bits of time
@@ -190,9 +192,9 @@ uint8_t measureBattery()
     float reading = analogRead(BATT) / 1024.0f;
     adc_off();
     float voltage = reading * 3.3f * 2.0f;
-    println(voltage);
+    // println(voltage);
     float rawPercent = (voltage - 3.2f) * 100.0f; // 3.2-4.2 V => 0-100 %
     uint8_t percent = (uint8_t)round(constrain(rawPercent, 0.0f, 100.0f));
-    println(percent, '%');
+    // println(percent, '%');
     return percent;
 }
