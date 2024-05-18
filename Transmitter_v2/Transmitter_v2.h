@@ -64,6 +64,16 @@ uint32_t _rxIconTimer = 0;
 bool _txIconActive = false;
 bool _rxIconActive = false;
 
+bool _refreshDisplay = false;
+void updateDisplay()
+{
+    if (_refreshDisplay)
+    {
+        display.display();
+        _refreshDisplay = false;
+    }
+}
+
 void displayRetries();
 
 void drawBattery(uint8_t x, uint8_t y, int8_t batt);

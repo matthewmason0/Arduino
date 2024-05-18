@@ -19,6 +19,7 @@ void setup()
     delay(250); // wait for the OLED to power up
     uint8_t val = display.begin(0x3C, true);
     Serial.println(val);
+
     display.clearDisplay();
     display.setRotation(2);
     display.drawBitmap(10, 0, LOGO, 44, 128, 1);
@@ -40,33 +41,10 @@ void setup()
     display.drawPixel(60, 54, 1);
     display.drawPixel(63, 54, 1);
     drawBattery(32, 5, 69);
-    // display.setCursor(39, 4);
-    // display.print(F("69%"));
-    // display.setCursor(39, 33);
-    // display.print(F("42%"));
-    // display.setCursor(27, 66);
-    // display.print(F("START"));
-    display.display();
-
     clearReceiverValues();
+    updateDisplay();
 
     println(F("connecting..."));
-    // _syncState_DISCOVERY(millis());
-    // while (true)
-    // {
-    //     while (!hc12.available())
-    //     {
-    //         updateSync(millis());
-    //     }
-    //     uint8_t c = hc12.read();
-    //     if (c == ACK)
-    //         break;
-    //     else
-    //         println(F("failed to connect"));
-    // }
-    // // response corresponds to the PREVIOUS discovery TX
-    // _syncState_SYNCED(_syncTimer - DISCOVERY_PERIOD);
-    // _state_CONNECTED();
 }
 
 void loop()
@@ -121,6 +99,7 @@ void step(const uint32_t now, const uint8_t msg)
     updateSync(now);
     updateIcons();
     updateEngineTime(now);
+    updateDisplay();
 }
 
 // non-blocking message processing
@@ -198,7 +177,7 @@ void displayRetries()
     uint8_t empty = 20 - fill;
     display.fillRect(31, 20, fill, 3, 1);
     display.fillRect(31+fill, 20, empty, 3, 0);
-    display.display();
+    _refreshDisplay = true;
 }
 
 void drawBattery(const uint8_t x, const uint8_t y, const int8_t batt)
@@ -268,7 +247,7 @@ void clearReceiverValues()
     display.write(DASH);
     display.write(DASH);
     display.setFont();
-    display.display();
+    _refreshDisplay = true;
 }
 
 void displayReceiverValues(const uint8_t batt, const uint16_t engTime, const EngineState engState)
@@ -291,7 +270,7 @@ void displayReceiverValues(const uint8_t batt, const uint16_t engTime, const Eng
             break;
     }
     drawEngineTime();
-    display.display();
+    _refreshDisplay = true;
 }
 
 void updateEngineTime(const uint32_t now)
@@ -303,7 +282,7 @@ void updateEngineTime(const uint32_t now)
             _engTime += 1;
             _lastEngTimeUpdate = now;
             drawEngineTime();
-            display.display();
+            _refreshDisplay = true;
         }
     }
 }
@@ -313,7 +292,7 @@ void displayTxIcon()
     if (!_txIconActive)
     {
         display.drawBitmap(8, 13, TX_ICON, 9, 5, 1);
-        display.display();
+        _refreshDisplay = true;
         _txIconActive = true;
     }
     _txIconTimer = millis();
@@ -324,7 +303,7 @@ void displayRxIcon()
     if (!_rxIconActive)
     {
         display.drawBitmap(8, 25, RX_ICON, 9, 5, 1);
-        display.display();
+        _refreshDisplay = true;
         _rxIconActive = true;
     }
     _rxIconTimer = millis();
@@ -336,13 +315,13 @@ void updateIcons()
     if (_txIconActive && (now - _txIconTimer) >= ICON_FLASH_TIME)
     {
         display.fillRect(8, 13, 9, 5, 0);
-        display.display();
+        _refreshDisplay = true;
         _txIconActive = false;
     }
     if (_rxIconActive && (now - _rxIconTimer) >= ICON_FLASH_TIME)
     {
         display.fillRect(8, 25, 9, 5, 0);
-        display.display();
+        _refreshDisplay = true;
         _rxIconActive = false;
     }
 }
