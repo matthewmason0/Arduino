@@ -37,6 +37,19 @@ uint16_t _engTime = 0;
 uint32_t _lastEngTimeUpdate = 0;
 EngineState _engState = EngineState::OFF;
 
+void updateEngineTime(const uint32_t now)
+{
+    if (_engState == EngineState::RUNNING)
+    {
+        if ((now - _lastEngTimeUpdate) >= 1000)
+        {
+            _engTime += 1;
+            _lastEngTimeUpdate = now;
+            drawEngineTime(_engTime);
+        }
+    }
+}
+
 void tx();
 
 enum class SyncState

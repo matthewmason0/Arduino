@@ -12,12 +12,6 @@
 
 Adafruit_SH1107 display(64, 128, &Wire);
 
-// Text Symbols
-static constexpr uint8_t COLON   = ':';
-static constexpr uint8_t DASH    = '-';
-static constexpr uint8_t PERCENT = '%';
-static constexpr uint8_t SPACE   = ' ';
-
 static constexpr uint32_t ICON_FLASH_TIME = 500; // ms
 uint32_t _txIconTimer = 0;
 uint32_t _rxIconTimer = 0;
@@ -36,10 +30,7 @@ void drawBattery(const uint8_t x, const uint8_t y, const int8_t batt)
         display.fillRect(x, y, 3, 5, 0);
         // clear text @ (x+7, y-1) 4 chars
         display.setCursor(x+7, y-1);
-        display.write(DASH);
-        display.write(DASH);
-        display.write(DASH);
-        display.write(PERCENT);
+        display.print(F("---%"));
         return;
     }
     // fill battery icon @ (x, y) 3x5
@@ -50,11 +41,11 @@ void drawBattery(const uint8_t x, const uint8_t y, const int8_t batt)
     // update text @ (x+7, y-1) 4 chars
     display.setCursor(x+7, y-1);
     display.print(batt);
-    display.write(PERCENT);
+    display.write('%');
     if (batt < 100)
-        display.write(SPACE);
+        display.write(' ');
     if (batt < 10)
-        display.write(SPACE);
+        display.write(' ');
     _refreshDisplay = true;
 }
 
@@ -69,7 +60,7 @@ void drawEngineTime(const uint16_t engTime)
     if (mins < 10)
         display.write('0');
     display.print(mins);
-    display.write(COLON);
+    display.write(':');
     if (secs < 10)
         display.write('0');
     display.print(secs);
@@ -82,20 +73,12 @@ void clearReceiverValues()
     drawBattery(32, 34, -1);
     // clear text @ (27, 66) 5 chars
     display.setCursor(27, 66);
-    display.write(SPACE);
-    display.write(DASH);
-    display.write(DASH);
-    display.write(DASH);
-    display.write(SPACE);
+    display.print(F(" --- "));
     // clear text @ (19, 85) 44x13
     display.fillRect(19, 85, 44, 13, 0);
     display.setFont(&NumericMono);
     display.setCursor(19, 85+12);
-    display.write(DASH);
-    display.write(DASH);
-    display.write(COLON);
-    display.write(DASH);
-    display.write(DASH);
+    display.print(F("--:--"));
     display.setFont();
     _refreshDisplay = true;
 }

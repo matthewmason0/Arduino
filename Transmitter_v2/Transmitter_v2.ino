@@ -55,19 +55,7 @@ void step(const uint32_t now, const uint8_t msg)
         processMessage(now, (msg == ZERO) ? 0 : msg);
     else if (msg)
         println(F("message ignored"));
-    // switch (_state)
-    // {
-    //     case TransmitterState::CONNECTING:
-    //     {
-    //         updateSync(now);
-    //         break;
-    //     }
-    //     case TransmitterState::CONNECTED:
-    //     {
-    //         updateSync(now);
-    //         break;
-    //     }
-    // }
+
     updateSync(now);
     updateIcons();
     updateEngineTime(now);
@@ -136,19 +124,6 @@ void processMessage(const uint32_t now, const uint8_t msg)
             _requestState_IDLE();
             _activeRequest_ENQ();
             break;
-        }
-    }
-}
-
-void updateEngineTime(const uint32_t now)
-{
-    if (_engState == EngineState::RUNNING)
-    {
-        if ((now - _lastEngTimeUpdate) >= 1000)
-        {
-            _engTime += 1;
-            _lastEngTimeUpdate = now;
-            drawEngineTime(_engTime);
         }
     }
 }
