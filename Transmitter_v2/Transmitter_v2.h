@@ -3,14 +3,9 @@
 
 #include <SoftwareSerial.h>
 #include <custom_print.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SH110X.h>
+#include "display_functions.h"
+#include "EngineState.h"
 #include <check_mem.h>
-
-// uint8_t* heapptr;
-// uint8_t* stackptr;
-
-Adafruit_SH1107 display(64, 128, &Wire);
 
 SoftwareSerial hc12(2, 3); // RX, TX
 
@@ -31,61 +26,69 @@ static constexpr uint8_t ZERO = 0x80; // substitute for 0 value
 
 static constexpr uint8_t PASSWORD = 0xDB; // 11011011
 
-// Text Symbols
-static constexpr uint8_t COLON   = ':';
-static constexpr uint8_t DASH    = '-';
-static constexpr uint8_t PERCENT = '%';
-static constexpr uint8_t SPACE   = ' ';
-
 static constexpr uint32_t DISCOVERY_PERIOD = 2000; // ms
 static constexpr uint32_t SYNC_PERIOD = 3000;
 uint32_t _syncTimer = 0;
-
-// static constexpr size_t TX_BUFFER_LEN = 16;
-// char _txBuffer[TX_BUFFER_LEN] = "";
 
 static constexpr uint8_t MAX_RETRIES = 10;
 uint8_t _retries = 0;
 
 uint16_t _engTime = 0;
 uint32_t _lastEngTimeUpdate = 0;
-
-enum class EngineState
-{
-    OFF = 0,
-    STARTING = 1,
-    RUNNING = 2
-};
 EngineState _engState = EngineState::OFF;
 
-static constexpr uint32_t ICON_FLASH_TIME = 500; // ms
-uint32_t _txIconTimer = 0;
-uint32_t _rxIconTimer = 0;
-bool _txIconActive = false;
-bool _rxIconActive = false;
+void tx();
 
-bool _refreshDisplay = false;
-void updateDisplay()
+enum class SyncState
 {
-    if (_refreshDisplay)
+    DISCOVERY,
+    SYNCED
+};
+SyncState _syncState = SyncState::DISCOVERY;
+void _syncState_DISCOVERY(const uint32_t syncTime)
+{
+    hc12.write(SOH);
+    check_mem();
+    drawTxIcon();
+    if (_syncState != SyncState::DISCOVERY)
     {
-        display.display();
-        _refreshDisplay = false;
+        println(F("_syncState DISCOVERY"));
+        _syncState = SyncState::DISCOVERY;
     }
+    _syncTimer = syncTime;
+}
+void _syncState_SYNCED(const uint32_t syncTime)
+{
+    if (_syncState != SyncState::SYNCED)
+    {
+        println(F("_syncState SYNCED"));
+        _syncState = SyncState::SYNCED;
+    }
+    tx();
+    println(F("sync"));
+    _syncTimer = syncTime;
 }
 
-void displayRetries();
-
-void drawBattery(uint8_t x, uint8_t y, int8_t batt);
-void drawEngineTime();
-
-void clearReceiverValues();
-void displayReceiverValues(uint8_t batt, uint16_t engTime, EngineState engState);
-void updateEngineTime(uint32_t now);
-
-void displayTxIcon();
-void displayRxIcon();
-void updateIcons();
+void updateSync(const uint32_t now)
+{
+    switch (_syncState)
+    {
+        case SyncState::DISCOVERY:
+        {
+            // update timer and TX at start of new discovery period
+            if ((now - _syncTimer) >= DISCOVERY_PERIOD)
+                _syncState_DISCOVERY(_syncTimer + DISCOVERY_PERIOD);
+            break;
+        }
+        case SyncState::SYNCED:
+        {
+            // update timer and TX at start of new period
+            if ((now - _syncTimer) >= SYNC_PERIOD)
+                _syncState_SYNCED(_syncTimer + SYNC_PERIOD);
+            break;
+        }
+    }
+}
 
 // need to prevent STX->other, ETX->other while request active
 
@@ -140,7 +143,7 @@ void _requestState_IDLE()
 {
     println(F("_requestState IDLE"));
     _retries = 0;
-    displayRetries();
+    drawRetries(_retries, MAX_RETRIES, _syncState == SyncState::DISCOVERY);
     _requestState = RequestState::IDLE;
 }
 void _requestState_WAITING_FOR_REPLY()
@@ -148,26 +151,6 @@ void _requestState_WAITING_FOR_REPLY()
     println(F("_requestState WAITING_FOR_REPLY"));
     _requestState = RequestState::WAITING_FOR_REPLY;
 }
-
-// enum class TransmitterState
-// {
-//     CONNECTING,
-//     CONNECTED
-// };
-// TransmitterState _state = TransmitterState::CONNECTING;
-// void _state_CONNECTING()
-// {
-//     println(F("_state CONNECTING"));
-//     _state = TransmitterState::CONNECTING;
-// }
-// void _state_CONNECTED()
-// {
-//     println(F("_state CONNECTED"));
-//     _activeRequest_ENQ();
-//     _state = TransmitterState::CONNECTED;
-// }
-
-void _syncState_DISCOVERY(const uint32_t syncTime);
 
 // runs once per tx window, when synced
 void tx()
@@ -183,7 +166,7 @@ void tx()
             _activeRequest_NONE();
             return;
         }
-        displayRetries();
+        drawRetries(_retries, MAX_RETRIES, _syncState == SyncState::DISCOVERY);
     }
     switch (_activeRequest)
     {
@@ -213,66 +196,21 @@ void tx()
         }
     }
     if (_activeRequest != ActiveRequest::NONE)
-        displayTxIcon();
+        drawTxIcon();
 }
 
-enum class SyncState
-{
-    DISCOVERY,
-    SYNCED
-};
-SyncState _syncState = SyncState::DISCOVERY;
-void _syncState_DISCOVERY(const uint32_t syncTime)
-{
-    hc12.write(SOH);
-    check_mem();
-    displayTxIcon();
-    // _txBuffer[0] = 0;
-    if (_syncState != SyncState::DISCOVERY)
-    {
-        println(F("_syncState DISCOVERY"));
-        _syncState = SyncState::DISCOVERY;
-    }
-    _syncTimer = syncTime;
-}
-void _syncState_SYNCED(const uint32_t syncTime)
-{
-    if (_syncState != SyncState::SYNCED)
-    {
-        println(F("_syncState SYNCED"));
-        _syncState = SyncState::SYNCED;
-    }
-    // if (_txBuffer[0])
-    // {
-    //     hc12.write(_txBuffer);
-    //     print(F("sent "));
-    //     printTxBuffer();
-    //     _txBuffer[0] = 0;
-    // }
-    tx();
-    println(F("sync"));
-    _syncTimer = syncTime;
-}
-
-void updateSync(const uint32_t now)
-{
-    switch (_syncState)
-    {
-        case SyncState::DISCOVERY:
-        {
-            // update timer and TX at start of new discovery period
-            if ((now - _syncTimer) >= DISCOVERY_PERIOD)
-                _syncState_DISCOVERY(_syncTimer + DISCOVERY_PERIOD);
-            break;
-        }
-        case SyncState::SYNCED:
-        {
-            // update timer and TX at start of new period
-            if ((now - _syncTimer) >= SYNC_PERIOD)
-                _syncState_SYNCED(_syncTimer + SYNC_PERIOD);
-            break;
-        }
-    }
-}
+/* messages:
+10 chars
+..........
+Connecting
+CONNECTING
+CONNECTED
+REQUESTING
+REQ RECVD
+REQ ERROR
+SUCCESS!
+START FAIL
+STOP FAIL
+*/
 
 #endif // TRANSMITTER_V2_H

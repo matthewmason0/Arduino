@@ -5,6 +5,7 @@
 #include <avr/wdt.h>
 #include <avr/sleep.h>
 #include <custom_print.h>
+#include "EngineState.h"
 
 SoftwareSerial hc12(5, 6); // RX, TX
 
@@ -53,12 +54,36 @@ uint32_t _startTimer = 0;
 uint32_t _engTimer = 0;
 uint32_t _engTotTime = 0;
 
-void printTxBuffer()
+EngineState _engState = EngineState::OFF;
+void _engState_OFF(const uint32_t now)
 {
-    for (size_t i = 0; _txBuffer[i]; i++)
-        print((uint8_t)((_txBuffer[i] == (char)ZERO) ? 0 : _txBuffer[i]), ' ');
-    println();
+    println("_engState OFF");
+    if (_engState == EngineState::RUNNING)
+    {
+        _engTotTime += (now - _engTimer);
+        println("_engTotTime: ", _engTotTime);
+    }
+    _engState = EngineState::OFF;
 }
+void _engState_STARTING(const uint32_t now)
+{
+    println("_engState STARTING");
+    _startTimer = now;
+    _engState = EngineState::STARTING;
+}
+void _engState_RUNNING(const uint32_t now)
+{
+    println("_engState RUNNING");
+    _engTimer = now;
+    _engState = EngineState::RUNNING;
+}
+
+// void printTxBuffer()
+// {
+//     for (size_t i = 0; _txBuffer[i]; i++)
+//         print((uint8_t)((_txBuffer[i] == (char)ZERO) ? 0 : _txBuffer[i]), ' ');
+//     println();
+// }
 
 enum class ReceiverState
 {
@@ -84,36 +109,6 @@ void _state_SLEEP()
     println("_state SLEEP");
     _engTotTime = 0;
     _state = ReceiverState::SLEEP;
-}
-
-enum class EngineState
-{
-    OFF = 0,
-    STARTING = 1,
-    RUNNING = 2
-};
-EngineState _engState = EngineState::OFF;
-void _engState_OFF(const uint32_t now)
-{
-    println("_engState OFF");
-    if (_engState == EngineState::RUNNING)
-    {
-        _engTotTime += (now - _engTimer);
-        println("_engTotTime: ", _engTotTime);
-    }
-    _engState = EngineState::OFF;
-}
-void _engState_STARTING(const uint32_t now)
-{
-    println("_engState STARTING");
-    _startTimer = now;
-    _engState = EngineState::STARTING;
-}
-void _engState_RUNNING(const uint32_t now)
-{
-    println("_engState RUNNING");
-    _engTimer = now;
-    _engState = EngineState::RUNNING;
 }
 
 enum class SyncState
