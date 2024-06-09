@@ -26,6 +26,11 @@ static constexpr uint8_t ZERO = 0x80; // substitute for 0 value
 
 static constexpr uint8_t PASSWORD = 0xDB; // 11011011
 
+static constexpr uint32_t BUTTON_DEBOUNCE_TIME = 50; // ms
+
+static constexpr uint32_t BATT_READ_PERIOD = 60000; // ms
+uint32_t _battReadTimer = 0 - BATT_READ_PERIOD;
+
 static constexpr uint32_t DISCOVERY_PERIOD = 2000; // ms
 static constexpr uint32_t SYNC_PERIOD = 3000;
 uint32_t _syncTimer = 0;
@@ -210,6 +215,24 @@ void tx()
     }
     if (_activeRequest != ActiveRequest::NONE)
         drawTxIcon();
+}
+
+void debounce(bool& var, const bool in,
+              bool& state, uint32_t& timer,
+              const uint32_t now, const uint32_t duration)
+{
+    if (in == var)
+        state = false;
+    else if (!state) // && (in != var), on transition
+    {
+        state = true;
+        timer = now;
+    }
+    if (state && ((now - timer) >= duration))
+    {
+        state = false;
+        var = !var;
+    }
 }
 
 /* messages:

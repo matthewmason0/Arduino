@@ -56,7 +56,9 @@ void step(const uint32_t now, const uint8_t msg)
     else if (msg)
         println(F("message ignored"));
 
+    processButtons(now);
     updateSync(now);
+    updateBattery(now);
     updateIcons();
     updateEngineTime(now);
     updateDisplay();
@@ -125,5 +127,51 @@ void processMessage(const uint32_t now, const uint8_t msg)
             _activeRequest_ENQ();
             break;
         }
+    }
+}
+
+// non-blocking button processing
+void processButtons(const uint32_t now)
+{
+    static bool startBtnState = false;
+    static bool startBtnDbncState = false;
+    static uint32_t startBtnDbncTimer = 0;
+    bool startBtnPrevState = startBtnState;
+    debounce(startBtnState, !digitalRead(BUTTON_A),
+             startBtnDbncState, startBtnDbncTimer, now, BUTTON_DEBOUNCE_TIME);
+    if (!startBtnPrevState && startBtnState) // on button press
+    {
+        ; // action
+    }
+
+    static bool stopBtnState = false;
+    static bool stopBtnDbncState = false;
+    static uint32_t stopBtnDbncTimer = 0;
+    bool stopBtnPrevState = stopBtnState;
+    debounce(stopBtnState, !digitalRead(BUTTON_C),
+             stopBtnDbncState, stopBtnDbncTimer, now, BUTTON_DEBOUNCE_TIME);
+    if (!stopBtnPrevState && stopBtnState) // on button press
+    {
+        ; // action
+    }
+}
+
+uint8_t measureBattery()
+{
+    float reading = analogRead(BATT) / 1024.0f;
+    float voltage = reading * 3.3f * 2.0f;
+    // println(voltage);
+    float rawPercent = (voltage - 3.2f) * 100.0f; // 3.2-4.2 V => 0-100 %
+    uint8_t percent = (uint8_t)round(constrain(rawPercent, 0.0f, 100.0f));
+    // println(percent, '%');
+    return percent;
+}
+
+void updateBattery(const uint32_t now)
+{
+    if ((now - _battReadTimer) >= BATT_READ_PERIOD)
+    {
+        drawTransmitterBattery(measureBattery());
+        _battReadTimer += BATT_READ_PERIOD;
     }
 }

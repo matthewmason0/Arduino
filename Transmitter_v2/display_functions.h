@@ -10,7 +10,17 @@
 #include "EngineState.h"
 #include <check_mem.h>
 
+//******************************************************************************
+// Public Variables
+//******************************************************************************
+
 Adafruit_SH1107 display(64, 128, &Wire);
+
+bool _refreshDisplay = false;
+
+//******************************************************************************
+// Private Variables
+//******************************************************************************
 
 static constexpr uint32_t ICON_FLASH_TIME = 500; // ms
 uint32_t _txIconTimer = 0;
@@ -18,9 +28,9 @@ uint32_t _rxIconTimer = 0;
 bool _txIconActive = false;
 bool _rxIconActive = false;
 
-bool _refreshDisplay = false;
-
-// private functions
+//******************************************************************************
+// Private Functions
+//******************************************************************************
 
 void drawBattery(const uint8_t x, const uint8_t y, const int8_t batt)
 {
@@ -83,6 +93,28 @@ void clearReceiverValues()
     _refreshDisplay = true;
 }
 
+//******************************************************************************
+// Public Functions
+//******************************************************************************
+
+void drawTransmitterBattery(const uint8_t batt)
+{
+    drawBattery(32, 5, batt);
+}
+
+void drawEngineIcon()
+{
+    display.fillRect(0, 63, 20, 12, 0);
+    display.drawBitmap(0, 63, ENG_ICON, 20, 12, 1);
+    _refreshDisplay = true;
+}
+
+void drawEngineAutoIcon()
+{
+    display.fillRect(0, 63, 20, 12, 0);
+    display.drawBitmap(0, 63, ENG_AUTO_ICON, 20, 12, 1);
+    _refreshDisplay = true;
+}
 
 void updateDisplay()
 {
@@ -118,15 +150,9 @@ void initializeDisplay()
     display.print(F("Connecting"));
     display.drawPixel(60, 54, 1);
     display.drawPixel(63, 54, 1);
-    drawBattery(32, 5, 69);
+    drawTransmitterBattery(-1);
     clearReceiverValues();
-
-    // delay(1000);
-    // display.drawBitmap(0, 63, ENG_ICON, 20, 12, 1);
-    // display.display();
-    // delay(1000);
-    // display.drawBitmap(0, 63, ENG_AUTO_ICON, 20, 12, 1);
-    // display.display();
+    drawEngineIcon();
 
     updateDisplay();
     // while (true);
