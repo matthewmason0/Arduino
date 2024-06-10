@@ -34,6 +34,6 @@ const GFXglyph NumericMonoGlyphs[] PROGMEM = {
 };
 
 const GFXfont NumericMono PROGMEM = {(uint8_t *)NumericMonoBitmaps, 
-                                       (GFXglyph *)NumericMonoGlyphs, 0x2D, 0x3A,  22};
+                                     (GFXglyph *)NumericMonoGlyphs, 0x2D, 0x3A, 22};
 
 // Approx. 1822 bytes

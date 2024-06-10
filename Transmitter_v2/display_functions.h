@@ -7,6 +7,7 @@
 #include "background.h"
 #include "icons.h"
 #include "NumericMono.h"
+#include "EngineFont.h"
 #include "EngineState.h"
 #include <check_mem.h>
 
@@ -81,9 +82,12 @@ void drawEngineTime(const uint16_t engTime)
 void clearReceiverValues()
 {
     drawBattery(32, 34, -1);
-    // clear text @ (27, 66) 5 chars
-    display.setCursor(27, 66);
-    display.print(F(" --- "));
+    // clear area (23, 65) 39x10
+    display.fillRect(23, 65, 39, 10, 0);
+    // draw text @ (29, 65) 27x10
+    display.setFont(&EngineFont);
+    display.setCursor(29, 65+9);
+    display.print(F("---"));
     // clear text @ (19, 85) 44x13
     display.fillRect(19, 85, 44, 13, 0);
     display.setFont(&NumericMono);
@@ -172,20 +176,28 @@ void drawReceiverValues(const uint8_t batt, const uint16_t engTime, const Engine
     check_mem();
     println(F("batt: "), batt, F(" time: "), engTime, F(" state: "), (uint8_t)engState);
     drawBattery(32, 34, batt);
-    // update text @ (27, 66) 5 chars
-    display.setCursor(27, 66);
+    // clear area (23, 65) 39x10
+    display.fillRect(23, 65, 39, 10, 0);
+    display.setFont(&EngineFont);
     switch (engState)
     {
         case EngineState::OFF:
-            display.print(F(" OFF "));
+            // draw text @ (28, 65) 29x10
+            display.setCursor(28, 65+9);
+            display.print(F("OFF"));
             break;
         case EngineState::STARTING:
+            // draw text @ (23, 65) 39x10
+            display.setCursor(23, 65+9);
             display.print(F("START"));
             break;
         case EngineState::RUNNING:
-            display.print(F(" RUN "));
+            // draw text @ (28, 65) 27x10
+            display.setCursor(28, 65+9);
+            display.print(F("RUN"));
             break;
     }
+    display.setFont();
     drawEngineTime(engTime);
     _refreshDisplay = true;
 }
