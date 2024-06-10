@@ -104,15 +104,13 @@ void drawTransmitterBattery(const uint8_t batt)
 
 void drawEngineIcon()
 {
-    display.fillRect(0, 63, 20, 12, 0);
-    display.drawBitmap(0, 63, ENG_ICON, 20, 12, 1);
+    display.drawBitmap(0, 63, ENG_ICON, 20, 12, 1, 0);
     _refreshDisplay = true;
 }
 
 void drawEngineAutoIcon()
 {
-    display.fillRect(0, 63, 20, 12, 0);
-    display.drawBitmap(0, 63, ENG_AUTO_ICON, 20, 12, 1);
+    display.drawBitmap(0, 63, ENG_AUTO_ICON, 20, 12, 1, 0);
     _refreshDisplay = true;
 }
 
@@ -132,13 +130,12 @@ void initializeDisplay()
 
     display.clearDisplay();
     display.setRotation(2);
-    display.drawBitmap(10, 0, LOGO, 44, 128, 1);
+    display.drawBitmap(10, 0, LOGO, 44, 128, 1, 0);
     display.display();
     check_mem();
     delay(800);
 
-    display.clearDisplay();
-    display.drawBitmap(0, 0, BACKGROUND, 64, 128, 1);
+    display.drawBitmap(0, 0, BACKGROUND, 64, 128, 1, 0);
     display.setTextSize(1);
     display.setTextColor(1, 0);
     display.setTextWrap(false);
@@ -198,7 +195,7 @@ void drawTxIcon()
     if (!_txIconActive)
     {
         _txIconActive = true;
-        display.drawBitmap(8, 13, TX_ICON, 9, 5, 1);
+        display.drawBitmap(8, 13, TX_ICON, 9, 5, 1, 0);
         _refreshDisplay = true;
     }
     _txIconTimer = millis();
@@ -209,7 +206,7 @@ void drawRxIcon()
     if (!_rxIconActive)
     {
         _rxIconActive = true;
-        display.drawBitmap(8, 25, RX_ICON, 9, 5, 1);
+        display.drawBitmap(8, 25, RX_ICON, 9, 5, 1, 0);
         _refreshDisplay = true;
     }
     _rxIconTimer = millis();
