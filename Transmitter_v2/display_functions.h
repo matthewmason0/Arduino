@@ -47,8 +47,10 @@ void drawBattery(const uint8_t x, const uint8_t y, const int8_t batt)
     // fill battery icon @ (x, y) 3x5
     uint8_t fill = (batt + 10) / 20;
     uint8_t empty = 5 - fill;
-    display.fillRect(x, y, 3, empty, 0);
-    display.fillRect(x, y+empty, 3, fill, 1);
+    if (empty) // fillRect breaks with a height of 0
+        display.fillRect(x, y, 3, empty, 0);
+    if (fill)
+        display.fillRect(x, y+empty, 3, fill, 1);
     // update text @ (x+7, y-1) 4 chars
     display.setCursor(x+7, y-1);
     display.print(batt);
