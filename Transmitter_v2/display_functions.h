@@ -47,7 +47,7 @@ void drawBattery(const uint8_t x, const uint8_t y, const int8_t batt)
     // fill battery icon @ (x, y) 3x5
     uint8_t fill = (batt + 10) / 20;
     uint8_t empty = 5 - fill;
-    if (empty) // fillRect breaks with a height of 0
+    if (empty) // don't call fillRect with a height of 0 - it breaks
         display.fillRect(x, y, 3, empty, 0);
     if (fill)
         display.fillRect(x, y+empty, 3, fill, 1);
@@ -108,6 +108,20 @@ void drawTransmitterBattery(const uint8_t batt)
     drawBattery(32, 5, batt);
 }
 
+void drawStatusText(const __FlashStringHelper *text, const uint8_t numEllipses = 0)
+{
+    // clear text @ (0, 48) 11 chars
+    display.setCursor(0, 48);
+    display.print(F("           "));
+    // draw text @ (0, 48) 0-10 chars
+    display.setCursor(0, 48);
+    display.print(text);
+    // add ellipses
+    for (int i = 0; i < numEllipses; i++)
+        display.drawPixel(display.getCursorX()+(i*3), 54, 1);
+    _refreshDisplay = true;
+}
+
 void drawEngineIcon()
 {
     display.drawBitmap(0, 63, ENG_ICON, 20, 12, 1, 0);
@@ -149,10 +163,7 @@ void initializeDisplay()
     display.print(F("START"));
     display.setCursor(41, 111);
     display.print(F("STOP"));
-    display.setCursor(0, 48);
-    display.print(F("Connecting"));
-    display.drawPixel(60, 54, 1);
-    display.drawPixel(63, 54, 1);
+    drawStatusText(F("Searching"), 3);
     drawTransmitterBattery(-1);
     clearReceiverValues();
     drawEngineIcon();
