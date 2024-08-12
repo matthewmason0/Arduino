@@ -1,6 +1,8 @@
 #ifndef TRANSMITTER_V2_H
 #define TRANSMITTER_V2_H
 
+// #define DISABLE_PRINT
+
 #include <SoftwareSerial.h>
 #include <custom_print.h>
 #include "display_functions.h"
@@ -55,6 +57,99 @@ void updateEngineTime(const uint32_t now)
     }
 }
 
+/* messages:
+10 chars
+..........
+Connecting
+CONNECTING
+CONNECTED
+REQUESTING
+REQ RECVD
+REQ ERROR
+SUCCESS!
+START FAIL
+STOP FAIL
+
+need to prevent STX->other, ETX->other while request active
+*/
+
+enum class TransmitterState
+{
+    SEARCHING,
+    IDLE,
+    IDLE_AUTO_RESTART,
+    REQUESTING_START,
+    REQUESTING_STOP,
+    REQUEST_ERROR,
+    STARTING,
+    STOPPING,
+    START_SUCCEEDED,
+    STOP_SUCCEEDED,
+    START_FAILED,
+    STOP_FAILED
+};
+TransmitterState _state = TransmitterState::SEARCHING;
+void _state_SEARCHING()
+{
+    println(F("_state SEARCHING"));
+    _state = TransmitterState::SEARCHING;
+}
+void _state_IDLE()
+{
+    println(F("_state IDLE"));
+    _state = TransmitterState::IDLE;
+}
+void _state_IDLE_AUTO_RESTART()
+{
+    println(F("_state IDLE_AUTO_RESTART"));
+    _state = TransmitterState::IDLE_AUTO_RESTART;
+}
+void _state_REQUESTING_START()
+{
+    println(F("_state REQUESTING_START"));
+    _state = TransmitterState::REQUESTING_START;
+}
+void _state_REQUESTING_STOP()
+{
+    println(F("_state REQUESTING_STOP"));
+    _state = TransmitterState::REQUESTING_STOP;
+}
+void _state_REQUEST_ERROR()
+{
+    println(F("_state REQUEST_ERROR"));
+    _state = TransmitterState::REQUEST_ERROR;
+}
+void _state_STARTING()
+{
+    println(F("_state STARTING"));
+    _state = TransmitterState::STARTING;
+}
+void _state_STOPPING()
+{
+    println(F("_state STOPPING"));
+    _state = TransmitterState::STOPPING;
+}
+void _state_START_SUCCEEDED()
+{
+    println(F("_state START_SUCCEEDED"));
+    _state = TransmitterState::START_SUCCEEDED;
+}
+void _state_STOP_SUCCEEDED()
+{
+    println(F("_state STOP_SUCCEEDED"));
+    _state = TransmitterState::STOP_SUCCEEDED;
+}
+void _state_START_FAILED()
+{
+    println(F("_state START_FAILED"));
+    _state = TransmitterState::START_FAILED;
+}
+void _state_STOP_FAILED()
+{
+    println(F("_state STOP_FAILED"));
+    _state = TransmitterState::STOP_FAILED;
+}
+
 void tx();
 
 enum class SyncState
@@ -107,8 +202,6 @@ void updateSync(const uint32_t now)
         }
     }
 }
-
-// need to prevent STX->other, ETX->other while request active
 
 enum class ActiveRequest
 {
@@ -234,19 +327,5 @@ void debounce(bool& var, const bool in,
         var = !var;
     }
 }
-
-/* messages:
-10 chars
-..........
-Connecting
-CONNECTING
-CONNECTED
-REQUESTING
-REQ RECVD
-REQ ERROR
-SUCCESS!
-START FAIL
-STOP FAIL
-*/
 
 #endif // TRANSMITTER_V2_H
