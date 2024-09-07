@@ -1,0 +1,30 @@
+##############################################################
+# Adafruit Feather 32u4 Custom
+feather32u4custom.name=Adafruit Feather 32u4 Custom
+feather32u4custom.bootloader.low_fuses=0xff
+feather32u4custom.bootloader.high_fuses=0xd8
+feather32u4custom.bootloader.extended_fuses=0xcf
+feather32u4custom.bootloader.file=caterina/Caterina-Feather32u4.hex
+feather32u4custom.bootloader.unlock_bits=0x3F
+feather32u4custom.bootloader.lock_bits=0x2F
+feather32u4custom.bootloader.tool=arduino:avrdude
+feather32u4custom.build.mcu=atmega32u4
+feather32u4custom.build.f_cpu=8000000L
+feather32u4custom.build.vid=0x239A
+feather32u4custom.build.pid=0x800C
+feather32u4custom.build.core=arduino:arduino
+feather32u4custom.build.variant=feather32u4
+feather32u4custom.build.board=AVR_FEATHER32U4
+feather32u4custom.build.usb_product="Feather 32u4"
+feather32u4custom.build.usb_manufacturer="Adafruit"
+feather32u4custom.build.extra_flags={build.usb_flags}
+feather32u4custom.upload.protocol=avr109
+feather32u4custom.upload.maximum_size=28672
+feather32u4custom.upload.maximum_data_size=2560
+feather32u4custom.upload.speed=57600
+feather32u4custom.upload.disable_flushing=true
+feather32u4custom.upload.use_1200bps_touch=true
+feather32u4custom.upload.wait_for_upload_port=true
+feather32u4custom.upload.tool=arduino:avrdude
+feather32u4custom.vid.0=0x239A
+feather32u4custom.pid.0=0x800C
