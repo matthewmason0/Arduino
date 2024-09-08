@@ -183,6 +183,13 @@ void adc_on()
     ADCSRA |= (1<<ADEN);
 }
 
+void detach_USB()
+{
+    USBCON |= (1<<FRZCLK); // Freeze the USB Clock
+    PLLCSR &= ~(1<<PLLE);  // Disable the USB Clock (PPL)
+    USBCON &= ~(1<<USBE);  // Disable the USB
+}
+
 void setup_sleep()
 {
     // shut down TWI
@@ -204,6 +211,7 @@ ISR(WDT_vect) {}
 
 void sleep()
 {
+    detach_USB();
     // hc12_sleep();
     uint8_t prr0_orig = PRR0;
     uint8_t prr1_orig = PRR1;
@@ -218,6 +226,7 @@ void sleep()
     sleep_disable();
     PRR0 = prr0_orig;
     PRR1 = prr1_orig;
+    USBDevice.attach();
     // hc12_wake();
 }
 

@@ -17,8 +17,7 @@ void setup()
     println("setup complete");
 
     LoRa.setPins(RF95_CS, RF95_RST, RF95_INT);
-    LoRa.begin(915e6);
-    LoRa.setTxPower(20);
+    LoRa.begin(915e6, 20);
     LoRa.setSpreadingFactor(11);
     LoRa.setSignalBandwidth(125e3);
     LoRa.setCodingRate4(5);
@@ -27,19 +26,35 @@ void setup()
 
 void loop()
 {
-    Serial.println("Sending 0...");
-    LoRa.beginPacket();
-    LoRa.write('0');
-    LoRa.endPacket(true);
-    Serial.println("Sent!");
+    // Serial.println("Sending 0...");
+    // LoRa.beginPacket();
+    // LoRa.write('0');
+    // LoRa.endPacket(true);
+    // Serial.println("Sent!");
+    // delay(10);
     // sleep();
-    Serial.println("woke up");
-    Serial.println("Sending 1...");
-    LoRa.beginPacket();
-    LoRa.write('1');
-    LoRa.endPacket(true);
-    Serial.println("Sent!");
-    while(1) { yield(); }
+    // Serial.println("woke up");
+    // Serial.println("Sending 1...");
+    // LoRa.beginPacket();
+    // LoRa.write('1');
+    // LoRa.endPacket(true);
+    // Serial.println("Sent!");
+    bool temp = false;
+    while(1)
+    {
+        digitalWrite(13, temp);
+        uint32_t start = millis();
+        LoRa.beginPacket();
+        LoRa.write('0');
+        LoRa.write('1');
+        LoRa.write('2');
+        LoRa.write('3');
+        uint32_t mid = millis();
+        LoRa.endPacket(true);
+        uint32_t end = millis();
+        println(mid - start, " ", end - mid);
+        temp = !temp;
+    }
 
     // const uint32_t now = millis();
 
