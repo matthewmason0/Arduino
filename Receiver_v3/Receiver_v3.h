@@ -33,7 +33,8 @@ uint32_t _sessionTimer = 0;
 
 static constexpr uint32_t SYNC_PERIOD = 1000; // ms
 static constexpr uint32_t SYNC_OFFSET = SYNC_PERIOD / 2;
-static constexpr uint32_t SYNC_ALIGN = SYNC_PERIOD - 414 + SYNC_OFFSET; // 414 ms TX delay
+static constexpr uint32_t SYNC_DELAY = 414; // 414 ms TX delay
+static constexpr uint32_t SYNC_ERROR_MAX = 25; // adjust sync when estimated error exceeds
 uint32_t _syncTimer = 0;
 
 static constexpr size_t TX_BUFFER_LEN = 16;
@@ -101,19 +102,19 @@ enum class ReceiverState
 ReceiverState _state = ReceiverState::NOT_CONNECTED;
 void _state_NOT_CONNECTED()
 {
-    println("_state NOT_CONNECTED");
+    println(millis(), " _state NOT_CONNECTED");
     _state = ReceiverState::NOT_CONNECTED;
 }
 void _state_CONNECTED(const uint32_t now)
 {
     if (_state != ReceiverState::CONNECTED)
-        println("_state CONNECTED");
+        println(millis(), " _state CONNECTED");
     _connectionTimer = now;
     _state = ReceiverState::CONNECTED;
 }
 void _state_SLEEP()
 {
-    println("_state SLEEP");
+    println(millis(), " _state SLEEP");
     _engTotTime = 0;
     _state = ReceiverState::SLEEP;
 }
@@ -148,12 +149,13 @@ void _syncState_SYNCED(const uint32_t syncTime)
         LoRa.idle();
     println("sync");
     _syncTimer = syncTime;
+    // println(millis(), " new _syncTimer=", _syncTimer);
     _syncState = SyncState::SYNCED;
 }
 void _syncState_SYNCED_RX()
 {
     LoRa.singleRx();
-    println("_syncState SYNCED_RX");
+    println(millis(), " _syncState SYNCED_RX");
     _syncState = SyncState::SYNCED_RX;
 }
 

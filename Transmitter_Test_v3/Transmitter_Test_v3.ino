@@ -214,8 +214,8 @@ void setup()
             println("failed to connect");
     }
     println("connected in ", millis() - start);
-    // response corresponds to the PREVIOUS discovery TX
-    _syncState_SYNCED(_syncTimer - DISCOVERY_PERIOD);
+    // due to SYNCING state, response corresponds to the PREVIOUS discovery period
+    _syncState_SYNCED(_syncTimer - DISCOVERY_PERIOD + SYNC_PERIOD);
 }
 
 char i = '0';

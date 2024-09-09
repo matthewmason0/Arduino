@@ -84,7 +84,7 @@ void loop()
     if (LoRa.available())
     {
         c = LoRa.read();
-        println("Received: ", c);
+        // println("Received: ", c);
     }
 
     const bool blocked = step(now, c);
@@ -132,7 +132,7 @@ bool step(const uint32_t now, const uint8_t msg)
         {
             println("Entering sleep mode @ ", now);
             sleep();
-            // delay(4000);
+            delay(1000);
             uint32_t future = millis();
             println("Woke up @ ", future);
             blocked = true;
@@ -148,14 +148,24 @@ bool step(const uint32_t now, const uint8_t msg)
 void processMessage(const uint32_t now, const uint8_t msg)
 {
     // println("processMessage(", now, ", ", msg, ")");
-    println("_sessionTimer: ", (now - _sessionTimer));
+    // println("_sessionTimer: ", (now - _sessionTimer));
     if (msg == SOH)
     {
         tx(ACK);
-        _sessionTimer = now;
+        // _sessionTimer = now;
         // immediately sends response, then aligns to sync
-        _syncState_SYNCED(millis() + SYNC_ALIGN);
+        _syncState_SYNCED(now - SYNC_DELAY + SYNC_OFFSET);
+        println("------");
         return;
+    }
+    // if sync has drifted, correct _syncTimer
+    int16_t syncError = (int16_t)(now - _syncTimer) - SYNC_OFFSET - SYNC_DELAY;
+    // println("syncError: ", syncError);
+    if (abs(syncError) > SYNC_ERROR_MAX)
+    {
+        println("Adjusting sync...");
+        _syncTimer += syncError;
+        println("new _syncTimer=", _syncTimer);
     }
     // if messsage is a request, override current _requestState
     if (msg & 0x80)
