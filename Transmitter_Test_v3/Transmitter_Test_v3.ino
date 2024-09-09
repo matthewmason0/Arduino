@@ -32,6 +32,13 @@ char _txBuffer[TX_BUFFER_LEN] = "";
 
 // char message[64] = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz12345678901";
 
+uint32_t checkTimer(const uint32_t now, const uint32_t timer)
+{
+    if (now > timer)
+        return now - timer;
+    return 0;
+}
+
 void printTxBuffer()
 {
     for (int i = 0; _txBuffer[i]; i++)
@@ -59,7 +66,9 @@ enum class SyncState
 {
     DISCOVERY_TX,
     DISCOVERY_RX,
-    SYNCED
+    SYNCING,
+    SYNCED,
+    SYNCED_RX
 };
 SyncState _syncState = SyncState::DISCOVERY_TX;
 void _syncState_DISCOVERY_TX(const uint32_t syncTime)
@@ -72,12 +81,17 @@ void _syncState_DISCOVERY_TX(const uint32_t syncTime)
     _syncTimer = syncTime;
     _syncState = SyncState::DISCOVERY_TX;
 }
-void _syncState_DISCOVERY_RX(const uint32_t syncTime)
+void _syncState_DISCOVERY_RX()
 {
     LoRa.singleRx();
     println("_syncState DISCOVERY_RX");
-    _syncTimer = syncTime;
     _syncState = SyncState::DISCOVERY_RX;
+}
+void _syncState_SYNCING(const uint32_t syncTime)
+{
+    println("_syncState SYNCING");
+    _syncTimer = syncTime;
+    _syncState = SyncState::SYNCING;
 }
 void _syncState_SYNCED(const uint32_t syncTime)
 {
@@ -90,10 +104,18 @@ void _syncState_SYNCED(const uint32_t syncTime)
         printTxBuffer();
         _txBuffer[0] = 0;
     }
+    else // nothing to send
+        LoRa.idle();
     println("sync");
     flag = true;
     _syncTimer = syncTime;
     _syncState = SyncState::SYNCED;
+}
+void _syncState_SYNCED_RX()
+{
+    LoRa.singleRx();
+    println("_syncState SYNCED_RX");
+    _syncState = SyncState::SYNCED_RX;
 }
 
 void updateSync(const uint32_t now)
@@ -102,24 +124,40 @@ void updateSync(const uint32_t now)
     {
         case SyncState::DISCOVERY_TX:
         {
-            if ((now - _syncTimer) >= DISCOVERY_PERIOD)
+            if (checkTimer(now, _syncTimer) >= DISCOVERY_PERIOD)
                 _syncState_DISCOVERY_TX(_syncTimer + DISCOVERY_PERIOD);
-            if (!LoRa.isTransmitting() && LoRa.validSignalDetected())
-                _syncState_DISCOVERY_RX(_syncTimer + DISCOVERY_PERIOD);
+            if (!LoRa.isTransmitting())
+                _syncState_DISCOVERY_RX();
             break;
         }
         case SyncState::DISCOVERY_RX:
         {
-            if ((now - _syncTimer) >= DISCOVERY_PERIOD)
+            if (checkTimer(now, _syncTimer) >= DISCOVERY_PERIOD)
+                _syncState_DISCOVERY_TX(_syncTimer + DISCOVERY_PERIOD);
+            if (LoRa.validSignalDetected())
+                _syncState_SYNCING(_syncTimer + DISCOVERY_PERIOD);
+            break;
+        }
+        case SyncState::SYNCING:
+        {
+            if (checkTimer(now, _syncTimer) >= DISCOVERY_PERIOD)
                 _syncState_DISCOVERY_TX(_syncTimer + DISCOVERY_PERIOD);
             break;
         }
         case SyncState::SYNCED:
         {
             // update timer and TX at start of new period
-            if ((now - _syncTimer) >= SYNC_PERIOD)
+            if (checkTimer(now, _syncTimer) >= SYNC_PERIOD)
                 _syncState_SYNCED(_syncTimer + SYNC_PERIOD);
-            if (flag && (now - _syncTimer) >= 1500)
+            if (!LoRa.isTransmitting())
+                _syncState_SYNCED_RX();
+            break;
+        }
+        case SyncState::SYNCED_RX:
+        {
+            if (checkTimer(now, _syncTimer) >= SYNC_PERIOD)
+                _syncState_SYNCED(_syncTimer + SYNC_PERIOD);
+            if (flag && checkTimer(now, _syncTimer) >= 500)
             {
                 println("half");
                 flag = false;
@@ -170,7 +208,7 @@ void setup()
             updateSync(millis());
         }
         uint8_t c = LoRa.read();
-        if (c == ACK && _syncState == SyncState::DISCOVERY_RX)
+        if (c == ACK && _syncState == SyncState::SYNCING)
             break;
         else
             println("failed to connect");
@@ -247,7 +285,7 @@ void loop()
         uint8_t c = LoRa.read();
         println(c);
         int16_t syncTime = end - _syncTimer;
-        println("sync: ", syncTime - 1500 - 420, " ms");
+        println("sync: ", syncTime - 500 - 414, " ms");
     }
     
 }

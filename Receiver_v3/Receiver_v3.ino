@@ -21,6 +21,7 @@ void setup()
     LoRa.setSignalBandwidth(125e3);
     LoRa.setCodingRate4(5);
     LoRa.enableCrc();
+    LoRa.singleRx();
 }
 
 uint32_t timer = 0;
@@ -28,20 +29,20 @@ uint32_t start = 0;
 // bool temp = false;
 void loop()
 {
-    Serial.println("Sending 0...");
-    LoRa.beginPacket();
-    LoRa.write('0');
-    LoRa.endPacket(true);
-    Serial.println("Sent!");
-    delay(10);
-    sleep();
-    Serial.println("woke up");
-    Serial.println("Sending 1...");
-    LoRa.beginPacket();
-    LoRa.write('1');
-    LoRa.endPacket(true);
-    Serial.println("Sent!");
-    delay(1000);
+    // Serial.println("Sending 0...");
+    // LoRa.beginPacket();
+    // LoRa.write('0');
+    // LoRa.endPacket(true);
+    // Serial.println("Sent!");
+    // delay(10);
+    // sleep();
+    // Serial.println("woke up");
+    // Serial.println("Sending 1...");
+    // LoRa.beginPacket();
+    // LoRa.write('1');
+    // LoRa.endPacket(true);
+    // Serial.println("Sent!");
+    // delay(1000);
     // bool temp = false;
 
     // timer = millis();
@@ -77,24 +78,20 @@ void loop()
     // }
     // temp = false;
 
-    // const uint32_t now = millis();
+    const uint32_t now = millis();
 
-    // uint8_t c = 0;
-    // if (rf95.available())
-    // {
-    //     uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
-    //     uint8_t len = sizeof(buf);
-    //     rf95.recv(buf, &len);
-    //     if (len)
-    //         c = buf[0];
-    //     println("Received: ", c);
-    // }
+    uint8_t c = 0;
+    if (LoRa.available())
+    {
+        c = LoRa.read();
+        println("Received: ", c);
+    }
 
-    // const bool blocked = step(now, c);
+    const bool blocked = step(now, c);
 
-    // const uint32_t dt = millis() - now;
-    // if (!blocked && (dt > 10))
-    //     println("slow loop: ", dt, "ms");
+    const uint32_t dt = millis() - now;
+    if (!blocked && (dt > 10))
+        println("slow loop: ", dt, "ms");
 }
 
 // runs once per loop (non-blocking except sleep)
@@ -104,7 +101,7 @@ bool step(const uint32_t now, const uint8_t msg)
     if (msg)
     {
         processMessage(now, msg);
-        if (_syncState == SyncState::SYNCED)
+        if (_syncState != SyncState::IDLE)
             _state_CONNECTED(now);
     }
     updateEngine(now);
@@ -134,8 +131,8 @@ bool step(const uint32_t now, const uint8_t msg)
         case ReceiverState::SLEEP:
         {
             println("Entering sleep mode @ ", now);
-            // sleep();
-            delay(4000);
+            sleep();
+            // delay(4000);
             uint32_t future = millis();
             println("Woke up @ ", future);
             blocked = true;
@@ -152,12 +149,12 @@ void processMessage(const uint32_t now, const uint8_t msg)
 {
     // println("processMessage(", now, ", ", msg, ")");
     println("_sessionTimer: ", (now - _sessionTimer));
-    if (msg == SOH && (now - _sessionTimer) > SYNC_PERIOD)
+    if (msg == SOH)
     {
         tx(ACK);
         _sessionTimer = now;
         // immediately sends response, then aligns to sync
-        _syncState_SYNCED(millis() - SYNC_DELAY);
+        _syncState_SYNCED(millis() + SYNC_ALIGN);
         return;
     }
     // if messsage is a request, override current _requestState
