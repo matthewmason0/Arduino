@@ -26,10 +26,10 @@ void loop()
 {
     if (LoRa.available())
     {
-        now = millis();
+        // now = millis();
         uint8_t c = LoRa.read();
-        Serial.print("Got "); Serial.print((char)c); Serial.print(" "); Serial.println(now - last);
-        last = now;
+        Serial.print("Got "); Serial.println((char)c); //Serial.print(" "); Serial.println(now - last);
+        // last = now;
         // LoRa.beginPacket();
         // LoRa.write(c);
         // LoRa.endPacket();

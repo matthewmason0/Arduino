@@ -7,7 +7,6 @@ void setup()
     pinMode(START, OUTPUT);
     pinMode(IGNITION, INPUT);
     pinMode(13, OUTPUT);
-    // hc12_wake();
     digitalWrite(START, 0);
     digitalWrite(13, 0);
     Serial.begin(9600);
@@ -24,37 +23,59 @@ void setup()
     LoRa.enableCrc();
 }
 
+uint32_t timer = 0;
+uint32_t start = 0;
+// bool temp = false;
 void loop()
 {
-    // Serial.println("Sending 0...");
+    Serial.println("Sending 0...");
+    LoRa.beginPacket();
+    LoRa.write('0');
+    LoRa.endPacket(true);
+    Serial.println("Sent!");
+    delay(10);
+    sleep();
+    Serial.println("woke up");
+    Serial.println("Sending 1...");
+    LoRa.beginPacket();
+    LoRa.write('1');
+    LoRa.endPacket(true);
+    Serial.println("Sent!");
+    delay(1000);
+    // bool temp = false;
+
+    // timer = millis();
     // LoRa.beginPacket();
     // LoRa.write('0');
     // LoRa.endPacket(true);
-    // Serial.println("Sent!");
-    // delay(10);
-    // sleep();
-    // Serial.println("woke up");
-    // Serial.println("Sending 1...");
-    // LoRa.beginPacket();
-    // LoRa.write('1');
-    // LoRa.endPacket(true);
-    // Serial.println("Sent!");
-    bool temp = false;
-    while(1)
-    {
-        digitalWrite(13, temp);
-        uint32_t start = millis();
-        LoRa.beginPacket();
-        LoRa.write('0');
-        LoRa.write('1');
-        LoRa.write('2');
-        LoRa.write('3');
-        uint32_t mid = millis();
-        LoRa.endPacket(true);
-        uint32_t end = millis();
-        println(mid - start, " ", end - mid);
-        temp = !temp;
-    }
+    // start = millis();
+    // LoRa.singleRx();
+    // while((millis() - timer) < 500)
+    // {
+    //     if (LoRa.validSignalDetected())
+    //     {
+    //         println("detected reply: ", millis() - timer);
+    //         while ((millis() - timer) < 1000)
+    //             if (LoRa.available())
+    //                 println("received ", (char)LoRa.read(), "! ", millis() - timer);
+    //         break;
+    //     }
+    //     yield();
+
+        // digitalWrite(13, temp);
+        // uint32_t start = millis();
+        // LoRa.beginPacket();
+        // LoRa.write('0');
+        // LoRa.write('1');
+        // LoRa.write('2');
+        // LoRa.write('3');
+        // uint32_t mid = millis();
+        // LoRa.endPacket(true);
+        // uint32_t end = millis();
+        // println(mid - start, " ", end - mid);
+        // temp = !temp;
+    // }
+    // temp = false;
 
     // const uint32_t now = millis();
 

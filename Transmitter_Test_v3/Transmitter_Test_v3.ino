@@ -1,14 +1,12 @@
-#include <RH_RF95.h>
+#include <LoRa.h>
 #include <custom_print.h>
 
-static constexpr int RF95_CS  = 8;
-static constexpr int RF95_INT = 7;
 static constexpr int RF95_RST = 4;
-static constexpr int START     = 5;
-static constexpr int IGNITION  = 6;
-static constexpr int BATT      = A9;
-
-RH_RF95 rf95(RF95_CS, RF95_INT);
+static constexpr int RF95_INT = 7;
+static constexpr int RF95_CS  = 8;
+static constexpr int START    = 5;
+static constexpr int IGNITION = 6;
+static constexpr int BATT     = A9;
 
 // static constexpr int BUTTON_A = 9;
 // static constexpr int BUTTON_B = 6;
@@ -24,8 +22,9 @@ static constexpr uint8_t ETX = 3  | 0x80; // stop engine request
 
 static constexpr uint8_t PASSWORD = 0xDB; // 11011011
 
-static constexpr uint32_t DISCOVERY_PERIOD = 2000; // ms
-static constexpr uint32_t SYNC_PERIOD = 3000;
+static constexpr uint32_t DISCOVERY_PERIOD = 500; // ms
+// static constexpr uint32_t DISCOVERY_TIMEOUT = 400;
+static constexpr uint32_t SYNC_PERIOD = 1000;
 uint32_t _syncTimer = 0;
 
 static constexpr size_t TX_BUFFER_LEN = 32;
@@ -58,31 +57,35 @@ bool flag = true;
 
 enum class SyncState
 {
-    DISCOVERY,
+    DISCOVERY_TX,
+    DISCOVERY_RX,
     SYNCED
 };
-SyncState _syncState = SyncState::DISCOVERY;
-void _syncState_DISCOVERY(const uint32_t syncTime)
+SyncState _syncState = SyncState::DISCOVERY_TX;
+void _syncState_DISCOVERY_TX(const uint32_t syncTime)
 {
-    uint8_t data[] = {SOH};
-    rf95.send(data, 1);
-    println("_syncState DISCOVERY");
+    LoRa.beginPacket();
+    LoRa.write(SOH);
+    LoRa.endPacket();
+    println("_syncState DISCOVERY_TX");
     _txBuffer[0] = 0;
     _syncTimer = syncTime;
-    _syncState = SyncState::DISCOVERY;
+    _syncState = SyncState::DISCOVERY_TX;
+}
+void _syncState_DISCOVERY_RX(const uint32_t syncTime)
+{
+    LoRa.singleRx();
+    println("_syncState DISCOVERY_RX");
+    _syncTimer = syncTime;
+    _syncState = SyncState::DISCOVERY_RX;
 }
 void _syncState_SYNCED(const uint32_t syncTime)
 {
     if (_txBuffer[0])
     {
-        size_t i;
-        for (i = 0; _txBuffer[i]; i++);
-        uint32_t a = millis();
-        rf95.send((uint8_t*)_txBuffer, i);
-        uint32_t b = millis();
-        rf95.waitPacketSent();
-        uint32_t c = millis();
-        println("Call: ", b-a, " ms | TX: ", c-b, " ms");
+        LoRa.beginPacket();
+        LoRa.print(_txBuffer);
+        LoRa.endPacket();
         print("sent ");
         printTxBuffer();
         _txBuffer[0] = 0;
@@ -97,10 +100,18 @@ void updateSync(const uint32_t now)
 {
     switch (_syncState)
     {
-        case SyncState::DISCOVERY:
+        case SyncState::DISCOVERY_TX:
         {
             if ((now - _syncTimer) >= DISCOVERY_PERIOD)
-                _syncState_DISCOVERY(_syncTimer + DISCOVERY_PERIOD);
+                _syncState_DISCOVERY_TX(_syncTimer + DISCOVERY_PERIOD);
+            if (!LoRa.isTransmitting() && LoRa.validSignalDetected())
+                _syncState_DISCOVERY_RX(_syncTimer + DISCOVERY_PERIOD);
+            break;
+        }
+        case SyncState::DISCOVERY_RX:
+        {
+            if ((now - _syncTimer) >= DISCOVERY_PERIOD)
+                _syncState_DISCOVERY_TX(_syncTimer + DISCOVERY_PERIOD);
             break;
         }
         case SyncState::SYNCED:
@@ -131,20 +142,16 @@ void setup()
     // pinMode(BUTTON_A, INPUT_PULLUP);
     // pinMode(BUTTON_B, INPUT_PULLUP);
     // pinMode(BUTTON_C, INPUT_PULLUP);
-    pinMode(RF95_RST, OUTPUT);
     pinMode(START, OUTPUT);
     pinMode(IGNITION, INPUT);
-    digitalWrite(RF95_RST, 1);
     digitalWrite(START, 0);
     Serial.begin(9600);
-    digitalWrite(RF95_RST, 0);
-    delay(10);
-    digitalWrite(RF95_RST, 1);
-    delay(10);
-    rf95.init();
-    rf95.setFrequency(915.0f);
-    rf95.setModemConfig(RH_RF95::ModemConfigChoice::Bw125Cr45Sf2048);
-    rf95.setTxPower(23);
+    LoRa.setPins(RF95_CS, RF95_RST, RF95_INT);
+    LoRa.begin(915e6, 20);
+    LoRa.setSpreadingFactor(11);
+    LoRa.setSignalBandwidth(125e3);
+    LoRa.setCodingRate4(5);
+    LoRa.enableCrc();
     delay(1000);
     // hc12.write(message);
     // println('0');
@@ -153,19 +160,17 @@ void setup()
     // timer = millis();
     println("connecting...");
     start = millis();
-    _syncState_DISCOVERY(start);
+    _syncState_DISCOVERY_TX(start);
     // tx(SOH);
     // _syncState_SYNCED(millis());
     while (true)
     {
-        while (!rf95.available())
+        while (!LoRa.available())
         {
             updateSync(millis());
         }
-        uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
-        uint8_t len = sizeof(buf);
-        rf95.recv(buf, &len);
-        if (len && buf[0] == ACK)
+        uint8_t c = LoRa.read();
+        if (c == ACK && _syncState == SyncState::DISCOVERY_RX)
             break;
         else
             println("failed to connect");
@@ -236,18 +241,13 @@ void loop()
     //     // Serial.println(count);
     // }
     updateSync(now);
-    while (rf95.available())
+    while (LoRa.available())
     {
         end = millis();
-        uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
-        uint8_t len = sizeof(buf);
-        rf95.recv(buf, &len);
-        if (len)
-        {
-            println(buf[0]);
-            int16_t syncTime = end - _syncTimer;
-            println("sync: ", syncTime - 1500 - 420, " ms");
-        }
+        uint8_t c = LoRa.read();
+        println(c);
+        int16_t syncTime = end - _syncTimer;
+        println("sync: ", syncTime - 1500 - 420, " ms");
     }
     
 }

@@ -45,6 +45,13 @@ char _txBuffer[TX_BUFFER_LEN] = "";
 // transmitter receives ACK
 // connection is made.
 
+// transmitter sends SOH, starts syncTimer (0-414 ms)
+// receiver receives SOH, begins transmitting ACK
+// transmitter detects incoming ACK (@ 492 ms), discovery is halted
+// receiver finishes transmitting ACK, sets syncTimer
+// transmitter receives ACK (@ 852 ms), sets syncTimer
+// connection is made.
+
 static constexpr uint32_t AWAKE_TIME = 2500; // ms
 uint32_t _awakeTimer = 0;
 
@@ -212,7 +219,7 @@ ISR(WDT_vect) {}
 void sleep()
 {
     detach_USB();
-    // hc12_sleep();
+    LoRa.sleep();
     uint8_t prr0_orig = PRR0;
     uint8_t prr1_orig = PRR1;
     cli();
@@ -227,7 +234,7 @@ void sleep()
     PRR0 = prr0_orig;
     PRR1 = prr1_orig;
     USBDevice.attach();
-    // hc12_wake();
+    LoRa.idle();
 }
 
 void debounce(bool& var, const bool in,
