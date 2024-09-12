@@ -61,6 +61,7 @@ void tx(const char c)
 }
 
 bool flag = true;
+bool connected = false;
 
 enum class SyncState
 {
@@ -95,6 +96,11 @@ void _syncState_SYNCING(const uint32_t syncTime)
 }
 void _syncState_SYNCED(const uint32_t syncTime)
 {
+    if (connected && !_txBuffer[0])
+    {
+        _txBuffer[0] = ENQ;
+        _txBuffer[1] = 0;
+    }
     if (_txBuffer[0])
     {
         LoRa.beginPacket();
@@ -216,6 +222,7 @@ void setup()
     println("connected in ", millis() - start);
     // due to SYNCING state, response corresponds to the PREVIOUS discovery period
     _syncState_SYNCED(_syncTimer - DISCOVERY_PERIOD + SYNC_PERIOD);
+    connected = true;
 }
 
 char i = '0';
