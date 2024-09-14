@@ -27,7 +27,7 @@ static constexpr uint8_t PASSWORD = 0xDB; // 11011011
 
 static constexpr uint32_t IGN_DEBOUNCE_TIME = 500; // ms
 
-static constexpr uint32_t CONNECTION_TIMEOUT = 30000; // ms
+static constexpr uint32_t CONNECTION_TIMEOUT = 10000; // ms
 uint32_t _connectionTimer = 0;
 uint32_t _sessionTimer = 0;
 
@@ -53,7 +53,7 @@ char _txBuffer[TX_BUFFER_LEN] = "";
 // transmitter receives ACK (@ 852 ms), sets syncTimer
 // connection is made.
 
-static constexpr uint32_t AWAKE_TIME = 2500; // ms
+static constexpr uint32_t AWAKE_TIME = 1500; // ms
 uint32_t _awakeTimer = 0;
 
 static constexpr uint32_t START_TIMEOUT = 15000; // ms
@@ -102,19 +102,19 @@ enum class ReceiverState
 ReceiverState _state = ReceiverState::NOT_CONNECTED;
 void _state_NOT_CONNECTED()
 {
-    println(millis(), " _state NOT_CONNECTED");
+    println("_state NOT_CONNECTED");
     _state = ReceiverState::NOT_CONNECTED;
 }
 void _state_CONNECTED(const uint32_t now)
 {
     if (_state != ReceiverState::CONNECTED)
-        println(millis(), " _state CONNECTED");
+        println("_state CONNECTED");
     _connectionTimer = now;
     _state = ReceiverState::CONNECTED;
 }
 void _state_SLEEP()
 {
-    println(millis(), " _state SLEEP");
+    println("_state SLEEP");
     _engTotTime = 0;
     _state = ReceiverState::SLEEP;
 }
@@ -122,7 +122,7 @@ void _state_SLEEP()
 enum class SyncState
 {
     IDLE,
-    SYNCED,
+    SYNCED_TX,
     SYNCED_RX
 };
 SyncState _syncState = SyncState::IDLE;
@@ -133,7 +133,7 @@ void _syncState_IDLE()
     _txBuffer[0] = 0;
     _syncState = SyncState::IDLE;
 }
-void _syncState_SYNCED(const uint32_t syncTime)
+void _syncState_SYNCED_TX(const uint32_t syncTime)
 {
     if (_txBuffer[0])
     {
@@ -147,15 +147,14 @@ void _syncState_SYNCED(const uint32_t syncTime)
     }
     else // nothing to send
         LoRa.idle();
-    println("sync");
+    // println("sync");
     _syncTimer = syncTime;
-    // println(millis(), " new _syncTimer=", _syncTimer);
-    _syncState = SyncState::SYNCED;
+    _syncState = SyncState::SYNCED_TX;
 }
 void _syncState_SYNCED_RX()
 {
     LoRa.singleRx();
-    println(millis(), " _syncState SYNCED_RX");
+    println("_syncState SYNCED_RX");
     _syncState = SyncState::SYNCED_RX;
 }
 
@@ -292,11 +291,11 @@ void updateSync(const uint32_t now)
     {
         case SyncState::IDLE:
             break;
-        case SyncState::SYNCED:
+        case SyncState::SYNCED_TX:
         {
             // update timer and TX at start of new period
             if (checkTimer(now, _syncTimer) >= SYNC_PERIOD)
-                _syncState_SYNCED(_syncTimer + SYNC_PERIOD);
+                _syncState_SYNCED_TX(_syncTimer + SYNC_PERIOD);
             if (!LoRa.isTransmitting())
                 _syncState_SYNCED_RX();
             break;
@@ -304,7 +303,7 @@ void updateSync(const uint32_t now)
         case SyncState::SYNCED_RX:
         {
             if (checkTimer(now, _syncTimer) >= SYNC_PERIOD)
-                _syncState_SYNCED(_syncTimer + SYNC_PERIOD);
+                _syncState_SYNCED_TX(_syncTimer + SYNC_PERIOD);
             break;
         }
     }

@@ -98,7 +98,7 @@ void _syncState_SYNCED(const uint32_t syncTime)
 {
     if (connected && !_txBuffer[0])
     {
-        _txBuffer[0] = ENQ;
+        _txBuffer[0] = ETX;
         _txBuffer[1] = 0;
     }
     if (_txBuffer[0])

@@ -10,7 +10,7 @@ void setup()
     digitalWrite(START, 0);
     digitalWrite(13, 0);
     Serial.begin(9600);
-    while (!Serial);
+    // while (!Serial);
     println("setting up sleep...");
     setup_sleep();
     println("setup complete");
@@ -99,11 +99,7 @@ void loop()
 bool step(const uint32_t now, const uint8_t msg)
 {
     if (msg)
-    {
         processMessage(now, msg);
-        if (_syncState != SyncState::IDLE)
-            _state_CONNECTED(now);
-    }
     updateEngine(now);
     bool blocked = false;
     switch (_state)
@@ -132,7 +128,7 @@ bool step(const uint32_t now, const uint8_t msg)
         {
             println("Entering sleep mode @ ", now);
             sleep();
-            delay(1000);
+            // delay(1000);
             uint32_t future = millis();
             println("Woke up @ ", future);
             blocked = true;
@@ -154,10 +150,14 @@ void processMessage(const uint32_t now, const uint8_t msg)
         tx(ACK);
         // _sessionTimer = now;
         // immediately sends response, then aligns to sync
-        _syncState_SYNCED(now - SYNC_DELAY + SYNC_OFFSET);
-        println("------");
+        _syncState_SYNCED_TX(now - SYNC_DELAY + SYNC_OFFSET);
+        _state_CONNECTED(now);
         return;
     }
+    if (_syncState == SyncState::IDLE)
+        return;
+    // we are synced and message is something other than SOH
+    _state_CONNECTED(now);
     // if sync has drifted, correct _syncTimer
     int16_t syncError = (int16_t)(now - _syncTimer) - SYNC_OFFSET - SYNC_DELAY;
     // println("syncError: ", syncError);
@@ -165,7 +165,6 @@ void processMessage(const uint32_t now, const uint8_t msg)
     {
         println("Adjusting sync...");
         _syncTimer += syncError;
-        println("new _syncTimer=", _syncTimer);
     }
     // if messsage is a request, override current _requestState
     if (msg & 0x80)
