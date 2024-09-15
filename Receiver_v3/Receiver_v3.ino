@@ -24,66 +24,14 @@ void setup()
     LoRa.singleRx();
 }
 
-uint32_t timer = 0;
-uint32_t start = 0;
-// bool temp = false;
 void loop()
 {
-    // Serial.println("Sending 0...");
-    // LoRa.beginPacket();
-    // LoRa.write('0');
-    // LoRa.endPacket(true);
-    // Serial.println("Sent!");
-    // delay(10);
-    // sleep();
-    // Serial.println("woke up");
-    // Serial.println("Sending 1...");
-    // LoRa.beginPacket();
-    // LoRa.write('1');
-    // LoRa.endPacket(true);
-    // Serial.println("Sent!");
-    // delay(1000);
-    // bool temp = false;
-
-    // timer = millis();
-    // LoRa.beginPacket();
-    // LoRa.write('0');
-    // LoRa.endPacket(true);
-    // start = millis();
-    // LoRa.singleRx();
-    // while((millis() - timer) < 500)
-    // {
-    //     if (LoRa.validSignalDetected())
-    //     {
-    //         println("detected reply: ", millis() - timer);
-    //         while ((millis() - timer) < 1000)
-    //             if (LoRa.available())
-    //                 println("received ", (char)LoRa.read(), "! ", millis() - timer);
-    //         break;
-    //     }
-    //     yield();
-
-        // digitalWrite(13, temp);
-        // uint32_t start = millis();
-        // LoRa.beginPacket();
-        // LoRa.write('0');
-        // LoRa.write('1');
-        // LoRa.write('2');
-        // LoRa.write('3');
-        // uint32_t mid = millis();
-        // LoRa.endPacket(true);
-        // uint32_t end = millis();
-        // println(mid - start, " ", end - mid);
-        // temp = !temp;
-    // }
-    // temp = false;
-
     const uint32_t now = millis();
 
     uint8_t c = 0;
     if (LoRa.available())
     {
-        c = LoRa.read();
+        c = (uint8_t)LoRa.read();
         // println("Received: ", c);
     }
 
@@ -144,11 +92,9 @@ bool step(const uint32_t now, const uint8_t msg)
 void processMessage(const uint32_t now, const uint8_t msg)
 {
     // println("processMessage(", now, ", ", msg, ")");
-    // println("_sessionTimer: ", (now - _sessionTimer));
     if (msg == SOH)
     {
         tx(ACK);
-        // _sessionTimer = now;
         // immediately sends response, then aligns to sync
         _syncState_SYNCED_TX(now - SYNC_DELAY + SYNC_OFFSET);
         _state_CONNECTED(now);
@@ -258,9 +204,9 @@ void updateEngine(const uint32_t now)
 
 uint8_t measureBattery()
 {
-    // adc_on();
+    adc_on();
     float reading = analogRead(BATT) / 1024.0f;
-    // adc_off();
+    adc_off();
     float voltage = reading * 3.3f * 2.0f;
     // println(voltage);
     float rawPercent = (voltage - 3.2f) * 100.0f; // 3.2-4.2 V => 0-100 %

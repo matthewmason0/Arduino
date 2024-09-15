@@ -10,9 +10,9 @@
 static constexpr int RF95_RST = 4;
 static constexpr int RF95_INT = 7;
 static constexpr int RF95_CS  = 8;
-static constexpr int START     = 5;
-static constexpr int IGNITION  = 6;
-static constexpr int BATT      = A9;
+static constexpr int START    = 5;
+static constexpr int IGNITION = 6;
+static constexpr int BATT     = A9;
 
 // ASCII Control Characters
 static constexpr uint8_t ACK = 6  | 0x80; // request completed
@@ -29,12 +29,11 @@ static constexpr uint32_t IGN_DEBOUNCE_TIME = 500; // ms
 
 static constexpr uint32_t CONNECTION_TIMEOUT = 10000; // ms
 uint32_t _connectionTimer = 0;
-uint32_t _sessionTimer = 0;
 
 static constexpr uint32_t SYNC_PERIOD = 1000; // ms
 static constexpr uint32_t SYNC_OFFSET = SYNC_PERIOD / 2;
-static constexpr uint32_t SYNC_DELAY = 414; // 414 ms TX delay
-static constexpr uint32_t SYNC_ERROR_MAX = 25; // adjust sync when estimated error exceeds
+static constexpr uint32_t SYNC_DELAY = 414; // packet duration
+static constexpr uint32_t SYNC_ERROR_MAX = 25; // if error exceeds this, adjust sync
 uint32_t _syncTimer = 0;
 
 static constexpr size_t TX_BUFFER_LEN = 16;
