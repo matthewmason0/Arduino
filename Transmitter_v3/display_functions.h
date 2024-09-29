@@ -9,7 +9,7 @@
 #include "NumericMono.h"
 #include "EngineFont.h"
 #include "EngineState.h"
-#include <check_mem.h>
+#include <custom_print.h>
 
 //******************************************************************************
 // Public Variables
@@ -23,7 +23,8 @@ bool _refreshDisplay = false;
 // Private Variables
 //******************************************************************************
 
-static constexpr uint32_t ICON_FLASH_TIME = 500; // ms
+static constexpr uint32_t LOGO_TIME = 800; // ms
+static constexpr uint32_t ICON_FLASH_TIME = 300;
 uint32_t _txIconTimer = 0;
 uint32_t _rxIconTimer = 0;
 bool _txIconActive = false;
@@ -145,15 +146,12 @@ void updateDisplay()
 
 void initializeDisplay()
 {
-    uint8_t val = display.begin(0x3C, true);
-    println(val);
-
+    display.begin(0x3C, true);
     display.clearDisplay();
     display.setRotation(2);
     display.drawBitmap(10, 0, LOGO, 44, 128, 1, 0);
     display.display();
-    check_mem();
-    delay(800);
+    delay(LOGO_TIME);
 
     display.drawBitmap(0, 0, BACKGROUND, 64, 128, 1, 0);
     display.setTextSize(1);
@@ -186,8 +184,7 @@ void drawRetries(const uint8_t retries, const uint8_t maxRetries, const bool inD
 
 void drawReceiverValues(const uint8_t batt, const uint16_t engTime, const EngineState engState)
 {
-    check_mem();
-    println(F("batt: "), batt, F(" time: "), engTime, F(" state: "), (uint8_t)engState);
+    // println(F("batt: "), batt, F(" time: "), engTime, F(" state: "), (uint8_t)engState);
     drawBattery(32, 34, batt);
     // clear area (23, 65) 39x10
     display.fillRect(23, 65, 39, 10, 0);

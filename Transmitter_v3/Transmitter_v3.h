@@ -5,7 +5,6 @@
 #include <custom_print.h>
 #include "display_functions.h"
 #include "EngineState.h"
-#include <check_mem.h>
 
 static constexpr int RF95_RST      = 4;
 static constexpr int RF95_INT      = 7;
@@ -31,7 +30,7 @@ static constexpr uint32_t BATT_READ_PERIOD = 60000; // ms
 uint32_t _battReadTimer = 0 - BATT_READ_PERIOD;
 
 static constexpr uint32_t DISCOVERY_PERIOD = 500; // ms
-static constexpr uint32_t SYNC_PERIOD = 1000;
+static constexpr uint32_t SYNC_PERIOD = 1500;
 uint32_t _syncTimer = 0;
 
 static constexpr uint8_t MAX_RETRIES = 10;
@@ -45,7 +44,7 @@ void updateEngineTime(const uint32_t now)
 {
     if (_engState == EngineState::RUNNING)
     {
-        if ((now - _lastEngTimeUpdate) >= 1000)
+        if (now - _lastEngTimeUpdate >= 1000)
         {
             _engTime += 1;
             _lastEngTimeUpdate = now;
@@ -53,6 +52,7 @@ void updateEngineTime(const uint32_t now)
         }
     }
 }
+
 
 void tx();
 
@@ -67,10 +67,10 @@ enum class SyncState
 SyncState _syncState = SyncState::DISCOVERY_TX;
 void _syncState_DISCOVERY_TX(const uint32_t syncTime)
 {
+    println(millis(), ", ", syncTime);
     LoRa.beginPacket();
     LoRa.write(SOH);
     LoRa.endPacket();
-    check_mem();
     drawTxIcon();
     println(F("_syncState DISCOVERY_TX"));
     _syncTimer = syncTime;
@@ -78,41 +78,42 @@ void _syncState_DISCOVERY_TX(const uint32_t syncTime)
 }
 void _syncState_DISCOVERY_RX()
 {
+    println(millis());
     LoRa.singleRx();
     println("_syncState DISCOVERY_RX");
     _syncState = SyncState::DISCOVERY_RX;
 }
 void _syncState_SYNCING(const uint32_t syncTime)
 {
+    println(millis());
     println("_syncState SYNCING");
     _syncTimer = syncTime;
     _syncState = SyncState::SYNCING;
 }
 void _syncState_SYNCED_TX(const uint32_t syncTime)
 {
+    println(millis(), ", ", syncTime);
     println(F("_syncState SYNCED_TX"));
     tx();
-    println(F("sync"));
     _syncTimer = syncTime;
     _syncState = SyncState::SYNCED_TX;
 }
 void _syncState_SYNCED_RX()
 {
+    println(millis());
     LoRa.singleRx();
     println("_syncState SYNCED_RX");
     _syncState = SyncState::SYNCED_RX;
 }
 
-bool isInDiscovery()
-{
-    return _syncState != SyncState::SYNCED_TX && _syncState != SyncState::SYNCED_RX;
-}
+static constexpr uint32_t MAX_TIMER_DURATION = 0xFFFF; // ms
 
 uint32_t checkTimer(const uint32_t now, const uint32_t timer)
 {
-    if (now > timer)
-        return now - timer;
-    return 0;
+    const uint32_t elapsed = now - timer;
+    if (elapsed > MAX_TIMER_DURATION)
+        return 0; // timer is in the future
+    return elapsed;
 }
 
 void updateSync(const uint32_t now)
@@ -202,6 +203,11 @@ void _activeRequest_ETX()
     _activeRequest = ActiveRequest::ETX;
 }
 
+bool isInDiscovery()
+{
+    return _syncState != SyncState::SYNCED_TX && _syncState != SyncState::SYNCED_RX;
+}
+
 enum class RequestState
 {
     IDLE,
@@ -229,7 +235,6 @@ void tx()
         _retries++;
         if (_retries > MAX_RETRIES)
         {
-            // _state_CONNECTING();
             _syncState_DISCOVERY_TX(millis());
             _requestState_IDLE();
             _activeRequest_NONE();
@@ -283,7 +288,7 @@ void debounce(bool& var, const bool in,
         state = true;
         timer = now;
     }
-    if (state && ((now - timer) >= duration))
+    if (state && (now - timer >= duration))
     {
         state = false;
         var = !var;

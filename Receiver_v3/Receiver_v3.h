@@ -30,7 +30,7 @@ static constexpr uint32_t IGN_DEBOUNCE_TIME = 500; // ms
 static constexpr uint32_t CONNECTION_TIMEOUT = 10000; // ms
 uint32_t _connectionTimer = 0;
 
-static constexpr uint32_t SYNC_PERIOD = 1000; // ms
+static constexpr uint32_t SYNC_PERIOD = 1500; // ms
 static constexpr uint32_t SYNC_OFFSET = SYNC_PERIOD / 2;
 static constexpr uint32_t SYNC_DELAY = 414; // packet duration
 static constexpr uint32_t SYNC_ERROR_MAX = 25; // if error exceeds this, adjust sync
@@ -128,12 +128,16 @@ SyncState _syncState = SyncState::IDLE;
 void _syncState_IDLE()
 {
     if (_syncState != SyncState::IDLE)
+    {
+        println(millis());
         println("_syncState IDLE");
+    }
     _txBuffer[0] = 0;
     _syncState = SyncState::IDLE;
 }
 void _syncState_SYNCED_TX(const uint32_t syncTime)
 {
+    println(millis(), ", ", syncTime);
     if (_txBuffer[0])
     {
         LoRa.beginPacket();
@@ -152,6 +156,7 @@ void _syncState_SYNCED_TX(const uint32_t syncTime)
 }
 void _syncState_SYNCED_RX()
 {
+    println(millis());
     LoRa.singleRx();
     println("_syncState SYNCED_RX");
     _syncState = SyncState::SYNCED_RX;
@@ -256,7 +261,7 @@ void debounce(bool& var, const bool in,
         state = true;
         timer = now;
     }
-    if (state && ((now - timer) >= duration))
+    if (state && (now - timer >= duration))
     {
         state = false;
         var = !var;
@@ -277,11 +282,14 @@ void tx(const char c)
     // printTxBuffer();
 }
 
+static constexpr uint32_t MAX_TIMER_DURATION = 0xFFFF; // ms
+
 uint32_t checkTimer(const uint32_t now, const uint32_t timer)
 {
-    if (now > timer)
-        return now - timer;
-    return 0;
+    const uint32_t elapsed = now - timer;
+    if (elapsed > MAX_TIMER_DURATION)
+        return 0; // timer is in the future
+    return elapsed;
 }
 
 void updateSync(const uint32_t now)

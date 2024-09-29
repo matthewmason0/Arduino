@@ -32,7 +32,7 @@ void loop()
     if (LoRa.available())
     {
         c = (uint8_t)LoRa.read();
-        // println("Received: ", c);
+        println("Received: ", c);
     }
 
     const bool blocked = step(now, c);
@@ -56,7 +56,7 @@ bool step(const uint32_t now, const uint8_t msg)
         {
             _syncState_IDLE();
             if (_engState == EngineState::OFF &&
-                (now - _awakeTimer) > AWAKE_TIME)
+                (now - _awakeTimer > AWAKE_TIME))
             {
                 _state_SLEEP();
             }
@@ -64,7 +64,7 @@ bool step(const uint32_t now, const uint8_t msg)
         }
         case ReceiverState::CONNECTED:
         {
-            if ((now - _connectionTimer) > CONNECTION_TIMEOUT)
+            if (now - _connectionTimer > CONNECTION_TIMEOUT)
             {
                 println("Connection timed out");
                 _state_NOT_CONNECTED();
@@ -109,7 +109,7 @@ void processMessage(const uint32_t now, const uint8_t msg)
     // println("syncError: ", syncError);
     if (abs(syncError) > SYNC_ERROR_MAX)
     {
-        println("Adjusting sync...");
+        println("Adjusting sync by ", syncError);
         _syncTimer += syncError;
     }
     // if messsage is a request, override current _requestState
@@ -186,7 +186,7 @@ void updateEngine(const uint32_t now)
             digitalWrite(13, 1);
             if (ignState)
                 _engState_RUNNING(now);
-            else if ((now - _startTimer) > START_TIMEOUT)
+            else if (now - _startTimer > START_TIMEOUT)
             {
                 println("Start timed out");
                 _engState_OFF(now);

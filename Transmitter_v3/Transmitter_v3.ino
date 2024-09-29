@@ -1,7 +1,9 @@
+// #define DISABLE_PRINT
 #include "Transmitter_v3.h"
 #include "display_functions.h"
 #include "EngineState.h"
-#include <check_mem.h>
+#include <LoRa.h>
+#include <custom_print.h>
 
 void setup()
 {
@@ -15,12 +17,9 @@ void setup()
     LoRa.setSignalBandwidth(125e3);
     LoRa.setCodingRate4(5);
     LoRa.enableCrc();
-    check_mem();
-
-    delay(250); // wait for the OLED to power up
     initializeDisplay();
-
     println(F("connecting..."));
+    _syncState_DISCOVERY_TX(millis());
 }
 
 void loop()
@@ -50,8 +49,7 @@ void step(const uint32_t now, const uint8_t msg)
     if (_syncState == SyncState::SYNCING && msg == ACK)
     {
         // SYNCING state uses additional discovery period, response corresponds to the PREVIOUS discovery period
-        _syncState_SYNCED_TX(_syncTimer - DISCOVERY_PERIOD + SYNC_PERIOD);
-        // updateSync(now);
+        _syncState_SYNCED_TX(_syncTimer - DISCOVERY_PERIOD);
         _requestState_IDLE();
         _activeRequest_ENQ();
     }
@@ -175,7 +173,7 @@ uint8_t measureBattery()
 
 void updateBattery(const uint32_t now)
 {
-    if ((now - _battReadTimer) >= BATT_READ_PERIOD)
+    if (now - _battReadTimer >= BATT_READ_PERIOD)
     {
         drawTransmitterBattery(measureBattery());
         _battReadTimer += BATT_READ_PERIOD;
