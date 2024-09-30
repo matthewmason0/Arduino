@@ -1,6 +1,8 @@
-#include <LoRa.h>
+#define DISABLE_PRINT
 #include "Receiver_v3.h"
 #include "EngineState.h"
+#include <LoRa.h>
+#include <custom_print.h>
 
 void setup()
 {
@@ -9,8 +11,9 @@ void setup()
     pinMode(13, OUTPUT);
     digitalWrite(START, 0);
     digitalWrite(13, 0);
+#ifndef DISABLE_PRINT
     Serial.begin(9600);
-    // while (!Serial);
+#endif
     println("setting up sleep...");
     setup_sleep();
     println("setup complete");

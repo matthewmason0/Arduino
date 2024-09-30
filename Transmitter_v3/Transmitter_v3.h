@@ -67,43 +67,43 @@ enum class SyncState
 SyncState _syncState = SyncState::DISCOVERY_TX;
 void _syncState_DISCOVERY_TX(const uint32_t syncTime)
 {
+    _syncTimer = syncTime;
     println(millis(), ", ", syncTime);
+    _syncState = SyncState::DISCOVERY_TX;
+    println(F("_syncState DISCOVERY_TX"));
     LoRa.beginPacket();
     LoRa.write(SOH);
     LoRa.endPacket();
     drawTxIcon();
-    println(F("_syncState DISCOVERY_TX"));
-    _syncTimer = syncTime;
-    _syncState = SyncState::DISCOVERY_TX;
 }
 void _syncState_DISCOVERY_RX()
 {
     println(millis());
-    LoRa.singleRx();
-    println("_syncState DISCOVERY_RX");
     _syncState = SyncState::DISCOVERY_RX;
+    println("_syncState DISCOVERY_RX");
+    LoRa.singleRx();
 }
 void _syncState_SYNCING(const uint32_t syncTime)
 {
-    println(millis());
-    println("_syncState SYNCING");
     _syncTimer = syncTime;
+    println(millis());
     _syncState = SyncState::SYNCING;
+    println("_syncState SYNCING");
 }
 void _syncState_SYNCED_TX(const uint32_t syncTime)
 {
+    _syncTimer = syncTime;
     println(millis(), ", ", syncTime);
+    _syncState = SyncState::SYNCED_TX;
     println(F("_syncState SYNCED_TX"));
     tx();
-    _syncTimer = syncTime;
-    _syncState = SyncState::SYNCED_TX;
 }
 void _syncState_SYNCED_RX()
 {
     println(millis());
-    LoRa.singleRx();
-    println("_syncState SYNCED_RX");
     _syncState = SyncState::SYNCED_RX;
+    println("_syncState SYNCED_RX");
+    LoRa.singleRx();
 }
 
 static constexpr uint32_t MAX_TIMER_DURATION = 0xFFFF; // ms

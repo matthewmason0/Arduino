@@ -1,4 +1,4 @@
-// #define DISABLE_PRINT
+#define DISABLE_PRINT
 #include "Transmitter_v3.h"
 #include "display_functions.h"
 #include "EngineState.h"
@@ -10,7 +10,9 @@ void setup()
     pinMode(BATT_BUTTON_A, INPUT_PULLUP);
     pinMode(BUTTON_B, INPUT_PULLUP);
     pinMode(BUTTON_C, INPUT_PULLUP);
+#ifndef DISABLE_PRINT
     Serial.begin(9600);
+#endif
     LoRa.setPins(RF95_CS, RF95_RST, RF95_INT);
     LoRa.begin(915e6, 20);
     LoRa.setSpreadingFactor(11);
