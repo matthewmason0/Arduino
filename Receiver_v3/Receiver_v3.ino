@@ -107,13 +107,16 @@ void processMessage(const uint32_t now, const uint8_t msg)
         return;
     // we are synced and message is something other than SOH
     _state_CONNECTED(now);
-    // if sync has drifted, correct _syncTimer
-    int16_t syncError = (int16_t)(now - _syncTimer) - SYNC_OFFSET - SYNC_DELAY;
-    // println("syncError: ", syncError);
-    if (abs(syncError) > SYNC_ERROR_MAX)
+    if (!_anyRxThisCycle) // first message this cycle
     {
-        println("Adjusting sync by ", syncError);
-        _syncTimer += syncError;
+        _anyRxThisCycle = true;
+        // if sync has drifted, correct _syncTimer
+        int16_t syncError = (int16_t)(now - _syncTimer) - SYNC_OFFSET - SYNC_DELAY;
+        if (abs(syncError) > SYNC_ERROR_MAX)
+        {
+            println("Adjusting sync by ", syncError);
+            _syncTimer += syncError;
+        }
     }
     // if messsage is a request, override current _requestState
     if (msg & 0x80)

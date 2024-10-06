@@ -125,6 +125,7 @@ enum class SyncState
     SYNCED_RX
 };
 SyncState _syncState = SyncState::IDLE;
+bool _anyRxThisCycle = false;
 void _syncState_IDLE()
 {
     if (_syncState != SyncState::IDLE)
@@ -133,11 +134,13 @@ void _syncState_IDLE()
         println("_syncState IDLE");
     }
     _txBuffer[0] = 0;
+    _anyRxThisCycle = false;
     _syncState = SyncState::IDLE;
 }
 void _syncState_SYNCED_TX(const uint32_t syncTime)
 {
     println(millis(), ", ", syncTime);
+    _anyRxThisCycle = false;
     if (_txBuffer[0])
     {
         LoRa.beginPacket();
