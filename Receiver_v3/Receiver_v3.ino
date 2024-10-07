@@ -128,7 +128,7 @@ void processMessage(const uint32_t now, const uint8_t msg)
         else if (msg == ETX)
             _requestState_ETX();
     }
-    switch(_requestState)
+    switch (_requestState)
     {
         case RequestState::NONE:
             break;

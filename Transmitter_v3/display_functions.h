@@ -109,7 +109,7 @@ void drawTransmitterBattery(const uint8_t batt)
     drawBattery(32, 5, batt);
 }
 
-void drawStatusText(const __FlashStringHelper *text, const uint8_t numEllipses = 0)
+void drawStatusText(const __FlashStringHelper* text, const uint8_t numEllipses = 0)
 {
     // clear text @ (0, 48) 11 chars
     display.setCursor(0, 48);

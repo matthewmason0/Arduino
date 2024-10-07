@@ -61,6 +61,70 @@ void step(const uint32_t now, const uint8_t msg)
         println(F("message ignored"));
 
     processButtons(now);
+
+    switch (_state)
+    {
+        case TransmitterState::SEARCHING:
+        {
+            if (_syncState != SyncState::DISCOVERY_TX && _syncState != SyncState::DISCOVERY_RX)
+                _state_SYNCING(now);
+            else
+                updateStatusText(STR_SEARCHING, now);
+            break;
+        }
+        case TransmitterState::SYNCING:
+        {
+            if (_syncState == SyncState::DISCOVERY_TX || _syncState == SyncState::DISCOVERY_RX)
+                _state_SEARCHING(now);
+            else
+                updateStatusText(STR_SYNCING, now);
+            break;
+        }
+        case TransmitterState::IDLE:
+        {
+            break;
+        }
+        case TransmitterState::IDLE_AUTO_RESTART:
+        {
+            break;
+        }
+        case TransmitterState::REQUESTING_START:
+        {
+            break;
+        }
+        case TransmitterState::REQUESTING_STOP:
+        {
+            break;
+        }
+        case TransmitterState::REQUEST_ERROR:
+        {
+            break;
+        }
+        case TransmitterState::STARTING:
+        {
+            break;
+        }
+        case TransmitterState::STOPPING:
+        {
+            break;
+        }
+        case TransmitterState::START_SUCCEEDED:
+        {
+            break;
+        }
+        case TransmitterState::START_FAILED:
+        {
+            break;
+        }
+        case TransmitterState::STOP_SUCCEEDED:
+        {
+            break;
+        }
+        case TransmitterState::STOP_FAILED:
+        {
+            break;
+        }
+    }
     updateSync(now);
     updateBattery(now);
     updateIcons();
@@ -99,6 +163,10 @@ void processMessage(const uint32_t now, const uint8_t msg)
             // upper 2 bits of msg -> engState
             _engState = (EngineState)(msg >> 5);
             drawReceiverValues(rxBatt, _engTime, _engState);
+            if (_state == TransmitterState::SYNCING && _autoRestart)
+                _state_IDLE_AUTO_RESTART();
+            else if (_state == TransmitterState::SYNCING)
+                _state_IDLE();
             _requestState_IDLE();
             _activeRequest_ENQ();
             break;
