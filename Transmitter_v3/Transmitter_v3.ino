@@ -233,27 +233,29 @@ void processMessage(const uint32_t now, const uint8_t msg)
 // non-blocking button processing
 void processButtons(const uint32_t now, bool& btnA, bool& btnC)
 {
-    static bool startBtnState = false;
-    static bool startBtnDbncState = false;
-    static uint32_t startBtnDbncTimer = 0;
-    bool startBtnPrevState = startBtnState;
-    debounce(startBtnState, !digitalRead(BATT_BUTTON_A),
-             startBtnDbncState, startBtnDbncTimer, now, BUTTON_DEBOUNCE_TIME);
-    if (!startBtnPrevState && startBtnState) // on button press
+    static bool btnAState = false;
+    static bool btnADbncState = false;
+    static uint32_t btnADbncTimer = 0;
+    bool btnAPrevState = btnAState;
+    debounce(btnAState, !digitalRead(BATT_BUTTON_A),
+             btnADbncState, btnADbncTimer, now, BUTTON_DEBOUNCE_TIME);
+    if (!btnAPrevState && btnAState) // on button press
         btnA = true;
     else
         btnA = false;
 
-    static bool stopBtnState = false;
-    static bool stopBtnDbncState = false;
-    static uint32_t stopBtnDbncTimer = 0;
-    bool stopBtnPrevState = stopBtnState;
-    debounce(stopBtnState, !digitalRead(BUTTON_C),
-             stopBtnDbncState, stopBtnDbncTimer, now, BUTTON_DEBOUNCE_TIME);
-    if (!stopBtnPrevState && stopBtnState) // on button press
+    static bool btnCState = false;
+    static bool btnCDbncState = false;
+    static uint32_t btnCDbncTimer = 0;
+    bool btnCPrevState = btnCState;
+    debounce(btnCState, !digitalRead(BUTTON_C),
+             btnCDbncState, btnCDbncTimer, now, BUTTON_DEBOUNCE_TIME);
+    if (!btnCPrevState && btnCState) // on button press
         btnC = true;
     else
         btnC = false;
+
+    updateButtonLabels(btnAState, btnCState);
 }
 
 uint8_t measureBattery()

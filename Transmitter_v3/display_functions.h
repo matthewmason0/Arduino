@@ -24,11 +24,18 @@ bool _refreshDisplay = false;
 //******************************************************************************
 
 static constexpr uint32_t LOGO_TIME = 800; // ms
-static constexpr uint32_t ICON_FLASH_TIME = 300;
+
+static constexpr uint32_t ICON_FLASH_TIME = 300; // ms
 uint32_t _txIconTimer = 0;
 uint32_t _rxIconTimer = 0;
 bool _txIconActive = false;
 bool _rxIconActive = false;
+
+static constexpr uint32_t BUTTON_HIGHLIGHT_TIME = 500; // ms
+uint32_t _btnAHighlightTimer = 0;
+uint32_t _btnCHighlightTimer = 0;
+bool _btnAHighlightActive = false;
+bool _btnCHighlightActive = false;
 
 //******************************************************************************
 // Private Functions
@@ -100,6 +107,31 @@ void clearReceiverValues()
     _refreshDisplay = true;
 }
 
+void drawButtonALabel(const __FlashStringHelper* text, const bool highlight = false)
+{
+    // clear text @ (0, 111) 5 chars
+    display.setCursor(0, 111);
+    display.print(F("     "));
+    // draw text @ (0, 111) 0-5 chars
+    display.setCursor(0, 111);
+    if (highlight)
+        display.setTextColor(0, 1);
+    display.print(text);
+    display.setTextColor(1, 0);
+    _refreshDisplay = true;
+}
+
+void drawButtonCLabel(const __FlashStringHelper* text, const bool highlight = false)
+{
+    // draw text @ (41, 111) 4 chars
+    display.setCursor(41, 111);
+    if (highlight)
+        display.setTextColor(0, 1);
+    display.print(text);
+    display.setTextColor(1, 0);
+    _refreshDisplay = true;
+}
+
 //******************************************************************************
 // Public Functions
 //******************************************************************************
@@ -157,10 +189,8 @@ void initializeDisplay()
     display.setTextSize(1);
     display.setTextColor(1, 0);
     display.setTextWrap(false);
-    display.setCursor(0, 111);
-    display.print(F("START"));
-    display.setCursor(41, 111);
-    display.print(F("STOP"));
+    drawButtonALabel(F("START"));
+    drawButtonCLabel(F("STOP"));
     drawStatusText(F("Searching"), 3);
     drawTransmitterBattery(-1);
     clearReceiverValues();
@@ -248,6 +278,37 @@ void updateIcons()
         _rxIconActive = false;
         display.fillRect(8, 25, 9, 5, 0);
         _refreshDisplay = true;
+    }
+}
+
+void updateButtonLabels(const bool btnAState, const bool btnCState)
+{
+    const uint32_t now = millis();
+
+    if (btnAState && !_btnAHighlightActive)
+        drawButtonALabel(F("START"), true);
+    if (btnAState) // regardless of _btnAHighlightActive
+    {
+        _btnAHighlightActive = true;
+        _btnAHighlightTimer = now;
+    }
+    else if (_btnAHighlightActive && (now - _btnAHighlightTimer) >= BUTTON_HIGHLIGHT_TIME)
+    {
+        _btnAHighlightActive = false;
+        drawButtonALabel(F("START"), false);
+    }
+
+    if (btnCState && !_btnCHighlightActive)
+        drawButtonCLabel(F("STOP"), true);
+    if (btnCState) // regardless of _btnCHighlightActive
+    {
+        _btnCHighlightActive = true;
+        _btnCHighlightTimer = now;
+    }
+    else if (_btnCHighlightActive && (now - _btnCHighlightTimer) >= BUTTON_HIGHLIGHT_TIME)
+    {
+        _btnCHighlightActive = false;
+        drawButtonCLabel(F("STOP"), false);
     }
 }
 
