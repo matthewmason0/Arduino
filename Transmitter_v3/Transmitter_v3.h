@@ -59,6 +59,133 @@ void updateEngineTime(const uint32_t now)
     }
 }
 
+// status strings  10 chars max "**********"
+#define STR_SEARCHING         F("Searching")
+#define STR_SYNCING           F("Syncing")
+#define STR_IDLE              F("Connected")
+#define STR_IDLE_AUTO_RESTART F("Connected")
+#define STR_REQUESTING_START  F("Req Start")
+#define STR_REQUESTING_STOP   F("Req Stop")
+#define STR_REQUEST_ERROR     F("Req Error!")
+#define STR_STARTING          F("Starting")
+#define STR_STOPPING          F("Stopping")
+#define STR_START_SUCCEEDED   F("Success!")
+#define STR_START_FAILED      F("Failed!")
+#define STR_STOP_SUCCEEDED    F("Success!")
+#define STR_STOP_FAILED       F("Failed!")
+
+enum class TransmitterState
+{
+    SEARCHING,         // discovery
+    SYNCING,           // waiting for first ENQ reply
+    IDLE,              // connected, _autoRestart FALSE
+    IDLE_AUTO_RESTART, // connected, _autoRestart TRUE
+    REQUESTING_START,
+    REQUESTING_STOP,
+    REQUEST_ERROR,
+    STARTING,
+    STOPPING,
+    START_SUCCEEDED,
+    START_FAILED,
+    STOP_SUCCEEDED,
+    STOP_FAILED
+};
+TransmitterState _state = TransmitterState::SEARCHING;
+void _state_SEARCHING(const uint32_t now)
+{
+    println(F("_state SEARCHING"));
+    _state = TransmitterState::SEARCHING;
+    _ellipsesTimer = now;
+    _ellipses = 0;
+    drawStatusText(STR_SEARCHING, _ellipses);
+}
+void _state_SYNCING(const uint32_t now)
+{
+    println(F("_state SYNCING"));
+    _state = TransmitterState::SYNCING;
+    _ellipsesTimer = now;
+    _ellipses = 0;
+    drawStatusText(STR_SYNCING, _ellipses);
+}
+void _state_IDLE()
+{
+    println(F("_state IDLE"));
+    _state = TransmitterState::IDLE;
+    drawStatusText(STR_IDLE, 1);
+}
+void _state_IDLE_AUTO_RESTART()
+{
+    println(F("_state IDLE_AUTO_RESTART"));
+    _state = TransmitterState::IDLE_AUTO_RESTART;
+    drawStatusText(STR_IDLE_AUTO_RESTART, 1);
+}
+void _state_REQUESTING_START(const uint32_t now)
+{
+    println(F("_state REQUESTING_START"));
+    _state = TransmitterState::REQUESTING_START;
+    _ellipsesTimer = now;
+    _ellipses = 0;
+    drawStatusText(STR_REQUESTING_START, _ellipses);
+}
+void _state_REQUESTING_STOP(const uint32_t now)
+{
+    println(F("_state REQUESTING_STOP"));
+    _state = TransmitterState::REQUESTING_STOP;
+    _ellipsesTimer = now;
+    _ellipses = 0;
+    drawStatusText(STR_REQUESTING_STOP, _ellipses);
+}
+void _state_REQUEST_ERROR()
+{
+    println(F("_state REQUEST_ERROR"));
+    _state = TransmitterState::REQUEST_ERROR;
+}
+void _state_STARTING(const uint32_t now)
+{
+    println(F("_state STARTING"));
+    _state = TransmitterState::STARTING;
+    _ellipsesTimer = now;
+    _ellipses = 0;
+    drawStatusText(STR_STARTING, _ellipses);
+}
+void _state_STOPPING(const uint32_t now)
+{
+    println(F("_state STOPPING"));
+    _state = TransmitterState::STOPPING;
+    _ellipsesTimer = now;
+    _ellipses = 0;
+    drawStatusText(STR_STOPPING, _ellipses);
+}
+void _state_START_SUCCEEDED()
+{
+    println(F("_state START_SUCCEEDED"));
+    _state = TransmitterState::START_SUCCEEDED;
+}
+void _state_START_FAILED()
+{
+    println(F("_state START_FAILED"));
+    _state = TransmitterState::START_FAILED;
+}
+void _state_STOP_SUCCEEDED()
+{
+    println(F("_state STOP_SUCCEEDED"));
+    _state = TransmitterState::STOP_SUCCEEDED;
+}
+void _state_STOP_FAILED()
+{
+    println(F("_state STOP_FAILED"));
+    _state = TransmitterState::STOP_FAILED;
+}
+
+void updateStatusText(const __FlashStringHelper* text, const uint32_t now)
+{
+    if (now - _ellipsesTimer >= ELLIPSES_PERIOD)
+    {
+        drawStatusText(text, _ellipses);
+        _ellipses = (_ellipses + 1) % 4;
+        _ellipsesTimer = now;
+    }
+}
 
 void tx();
 
@@ -241,6 +368,7 @@ void tx()
         _retries++;
         if (_retries > MAX_RETRIES)
         {
+            _state_SEARCHING(millis());
             _syncState_DISCOVERY_TX(millis());
             _requestState_IDLE();
             _activeRequest_NONE();
@@ -298,122 +426,6 @@ void debounce(bool& var, const bool in,
     {
         state = false;
         var = !var;
-    }
-}
-
-// status strings  10 chars max "**********"
-#define STR_SEARCHING         F("Searching")
-#define STR_SYNCING           F("Syncing")
-#define STR_IDLE              F("Connected")
-#define STR_IDLE_AUTO_RESTART F("Connected")
-#define STR_REQUESTING_START  F("Req Start")
-#define STR_REQUESTING_STOP   F("Req Stop")
-#define STR_REQUEST_ERROR     F("Req Error!")
-#define STR_STARTING          F("Starting")
-#define STR_STOPPING          F("Stopping")
-#define STR_START_SUCCEEDED   F("Success!")
-#define STR_START_FAILED      F("Failed!")
-#define STR_STOP_SUCCEEDED    F("Success!")
-#define STR_STOP_FAILED       F("Failed!")
-
-enum class TransmitterState
-{
-    SEARCHING,         // discovery
-    SYNCING,           // waiting for first ENQ reply
-    IDLE,              // connected, _autoRestart FALSE
-    IDLE_AUTO_RESTART, // connected, _autoRestart TRUE
-    REQUESTING_START,
-    REQUESTING_STOP,
-    REQUEST_ERROR,
-    STARTING,
-    STOPPING,
-    START_SUCCEEDED,
-    START_FAILED,
-    STOP_SUCCEEDED,
-    STOP_FAILED
-};
-TransmitterState _state = TransmitterState::SEARCHING;
-void _state_SEARCHING(const uint32_t now)
-{
-    println(F("_state SEARCHING"));
-    _state = TransmitterState::SEARCHING;
-    _ellipsesTimer = now;
-    _ellipses = 0;
-    drawStatusText(STR_SEARCHING, _ellipses);
-}
-void _state_SYNCING(const uint32_t now)
-{
-    println(F("_state SYNCING"));
-    _state = TransmitterState::SYNCING;
-    _ellipsesTimer = now;
-    _ellipses = 0;
-    drawStatusText(STR_SYNCING, _ellipses);
-}
-void _state_IDLE()
-{
-    println(F("_state IDLE"));
-    _state = TransmitterState::IDLE;
-    drawStatusText(STR_IDLE, 1);
-}
-void _state_IDLE_AUTO_RESTART()
-{
-    println(F("_state IDLE_AUTO_RESTART"));
-    _state = TransmitterState::IDLE_AUTO_RESTART;
-    drawStatusText(STR_IDLE_AUTO_RESTART, 1);
-}
-void _state_REQUESTING_START()
-{
-    println(F("_state REQUESTING_START"));
-    _state = TransmitterState::REQUESTING_START;
-}
-void _state_REQUESTING_STOP()
-{
-    println(F("_state REQUESTING_STOP"));
-    _state = TransmitterState::REQUESTING_STOP;
-}
-void _state_REQUEST_ERROR()
-{
-    println(F("_state REQUEST_ERROR"));
-    _state = TransmitterState::REQUEST_ERROR;
-}
-void _state_STARTING()
-{
-    println(F("_state STARTING"));
-    _state = TransmitterState::STARTING;
-}
-void _state_STOPPING()
-{
-    println(F("_state STOPPING"));
-    _state = TransmitterState::STOPPING;
-}
-void _state_START_SUCCEEDED()
-{
-    println(F("_state START_SUCCEEDED"));
-    _state = TransmitterState::START_SUCCEEDED;
-}
-void _state_START_FAILED()
-{
-    println(F("_state START_FAILED"));
-    _state = TransmitterState::START_FAILED;
-}
-void _state_STOP_SUCCEEDED()
-{
-    println(F("_state STOP_SUCCEEDED"));
-    _state = TransmitterState::STOP_SUCCEEDED;
-}
-void _state_STOP_FAILED()
-{
-    println(F("_state STOP_FAILED"));
-    _state = TransmitterState::STOP_FAILED;
-}
-
-void updateStatusText(const __FlashStringHelper* text, const uint32_t now)
-{
-    if (now - _ellipsesTimer >= ELLIPSES_PERIOD)
-    {
-        drawStatusText(text, _ellipses);
-        _ellipses = (_ellipses + 1) % 4;
-        _ellipsesTimer = now;
     }
 }
 

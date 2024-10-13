@@ -60,7 +60,8 @@ void step(const uint32_t now, const uint8_t msg)
     else if (msg)
         println(F("message ignored"));
 
-    processButtons(now);
+    bool btnAPressed, btnCPressed;
+    processButtons(now, btnAPressed, btnCPressed);
 
     switch (_state)
     {
@@ -82,6 +83,10 @@ void step(const uint32_t now, const uint8_t msg)
         }
         case TransmitterState::IDLE:
         {
+            if (btnAPressed)
+                _state_REQUESTING_START(now);
+            else if (btnCPressed)
+                _state_REQUESTING_STOP(now);
             break;
         }
         case TransmitterState::IDLE_AUTO_RESTART:
@@ -90,10 +95,12 @@ void step(const uint32_t now, const uint8_t msg)
         }
         case TransmitterState::REQUESTING_START:
         {
+            updateStatusText(STR_REQUESTING_START, now);
             break;
         }
         case TransmitterState::REQUESTING_STOP:
         {
+            updateStatusText(STR_REQUESTING_STOP, now);
             break;
         }
         case TransmitterState::REQUEST_ERROR:
@@ -102,10 +109,12 @@ void step(const uint32_t now, const uint8_t msg)
         }
         case TransmitterState::STARTING:
         {
+            updateStatusText(STR_STARTING, now);
             break;
         }
         case TransmitterState::STOPPING:
         {
+            updateStatusText(STR_STOPPING, now);
             break;
         }
         case TransmitterState::START_SUCCEEDED:
@@ -130,6 +139,38 @@ void step(const uint32_t now, const uint8_t msg)
     updateIcons();
     updateEngineTime(now);
     updateDisplay();
+}
+
+void decideNextRequest()
+{
+    switch (_state)
+    {
+        case TransmitterState::SEARCHING:
+            break;
+        case TransmitterState::SYNCING:
+            if (_autoRestart)
+                _state_IDLE_AUTO_RESTART();
+            else
+                _state_IDLE();
+        case TransmitterState::IDLE:
+        case TransmitterState::IDLE_AUTO_RESTART:
+        case TransmitterState::REQUEST_ERROR:
+        case TransmitterState::STARTING:
+        case TransmitterState::STOPPING:
+        case TransmitterState::START_SUCCEEDED:
+        case TransmitterState::START_FAILED:
+        case TransmitterState::STOP_SUCCEEDED:
+        case TransmitterState::STOP_FAILED:
+            _activeRequest_ENQ();
+            break;
+        case TransmitterState::REQUESTING_START:
+            _activeRequest_STX();
+            break;
+        case TransmitterState::REQUESTING_STOP:
+            _activeRequest_ETX();
+            break;
+    }
+    _requestState_IDLE();
 }
 
 // non-blocking message processing
@@ -163,24 +204,15 @@ void processMessage(const uint32_t now, const uint8_t msg)
             // upper 2 bits of msg -> engState
             _engState = (EngineState)(msg >> 5);
             drawReceiverValues(rxBatt, _engTime, _engState);
-            if (_state == TransmitterState::SYNCING && _autoRestart)
-                _state_IDLE_AUTO_RESTART();
-            else if (_state == TransmitterState::SYNCING)
-                _state_IDLE();
-            _requestState_IDLE();
-            _activeRequest_ENQ();
+            decideNextRequest();
             break;
         }
         case ActiveRequest::STX:
         {
             if (msg == ACK)
-            {
-                ; // success
-            }
+                _state_STARTING(now);
             else
-            {
-                ; // failure
-            }
+                _state_REQUEST_ERROR();
             _requestState_IDLE();
             _activeRequest_ENQ();
             break;
@@ -188,13 +220,9 @@ void processMessage(const uint32_t now, const uint8_t msg)
         case ActiveRequest::ETX:
         {
             if (msg == ACK)
-            {
-                ; // success
-            }
+                _state_STOPPING(now);
             else
-            {
-                ; // failure
-            }
+                _state_REQUEST_ERROR();
             _requestState_IDLE();
             _activeRequest_ENQ();
             break;
@@ -203,7 +231,7 @@ void processMessage(const uint32_t now, const uint8_t msg)
 }
 
 // non-blocking button processing
-void processButtons(const uint32_t now)
+void processButtons(const uint32_t now, bool& btnA, bool& btnC)
 {
     static bool startBtnState = false;
     static bool startBtnDbncState = false;
@@ -212,9 +240,9 @@ void processButtons(const uint32_t now)
     debounce(startBtnState, !digitalRead(BATT_BUTTON_A),
              startBtnDbncState, startBtnDbncTimer, now, BUTTON_DEBOUNCE_TIME);
     if (!startBtnPrevState && startBtnState) // on button press
-    {
-        ; // action
-    }
+        btnA = true;
+    else
+        btnA = false;
 
     static bool stopBtnState = false;
     static bool stopBtnDbncState = false;
@@ -223,9 +251,9 @@ void processButtons(const uint32_t now)
     debounce(stopBtnState, !digitalRead(BUTTON_C),
              stopBtnDbncState, stopBtnDbncTimer, now, BUTTON_DEBOUNCE_TIME);
     if (!stopBtnPrevState && stopBtnState) // on button press
-    {
-        ; // action
-    }
+        btnC = true;
+    else
+        btnC = false;
 }
 
 uint8_t measureBattery()
