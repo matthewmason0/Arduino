@@ -48,6 +48,7 @@ void loop()
 // runs once per loop (non-blocking)
 void step(const uint32_t now, const uint8_t msg)
 {
+    // message processing
     if (_syncState == SyncState::SYNCING && msg == ACK)
     {
         // SYNCING state uses additional discovery period, response corresponds to the PREVIOUS discovery period
@@ -60,9 +61,11 @@ void step(const uint32_t now, const uint8_t msg)
     else if (msg)
         println(F("message ignored"));
 
+    // button processing
     bool btnAPressed, btnCPressed;
     processButtons(now, btnAPressed, btnCPressed);
 
+    // update current state
     switch (_state)
     {
         case TransmitterState::SEARCHING:
@@ -83,7 +86,9 @@ void step(const uint32_t now, const uint8_t msg)
         }
         case TransmitterState::IDLE:
         {
-            if (btnAPressed)
+            if (btnAPressed && _engState == EngineState::RUNNING) // toggle auto restart
+                _state_IDLE_AUTO_RESTART();
+            else if (btnAPressed)
                 _state_REQUESTING_START(now);
             else if (btnCPressed)
                 _state_REQUESTING_STOP(now);
@@ -91,6 +96,12 @@ void step(const uint32_t now, const uint8_t msg)
         }
         case TransmitterState::IDLE_AUTO_RESTART:
         {
+            if (btnAPressed) // toggle auto restart
+                _state_IDLE();
+            else if (btnCPressed)
+                _state_REQUESTING_STOP(now);
+            else if (_engState == EngineState::OFF) // auto restart
+                _state_REQUESTING_START(now);
             break;
         }
         case TransmitterState::REQUESTING_START:
@@ -105,35 +116,52 @@ void step(const uint32_t now, const uint8_t msg)
         }
         case TransmitterState::REQUEST_ERROR:
         {
+            if (now - _stateTimer >= MESSAGE_STATE_TIME)
+            {
+                if (_autoRestart)
+                    _state_IDLE_AUTO_RESTART();
+                else
+                    _state_IDLE();
+            }
             break;
         }
         case TransmitterState::STARTING:
         {
-            updateStatusText(STR_STARTING, now);
+            if (_engState == EngineState::RUNNING)
+                _state_START_SUCCEEDED(now);
+            else if (now - _stateTimer >= STARTING_TIMEOUT)
+                _state_START_FAILED(now);
+            else
+                updateStatusText(STR_STARTING, now);
             break;
         }
         case TransmitterState::STOPPING:
         {
-            updateStatusText(STR_STOPPING, now);
+            if (_engState == EngineState::OFF)
+                _state_STOP_SUCCEEDED(now);
+            else if (now - _stateTimer >= STOPPING_TIMEOUT)
+                _state_STOP_FAILED(now);
+            else
+                updateStatusText(STR_STOPPING, now);
             break;
         }
         case TransmitterState::START_SUCCEEDED:
         {
+            if (now - _stateTimer >= MESSAGE_STATE_TIME)
+                _state_IDLE_AUTO_RESTART();
             break;
         }
         case TransmitterState::START_FAILED:
-        {
-            break;
-        }
         case TransmitterState::STOP_SUCCEEDED:
-        {
-            break;
-        }
         case TransmitterState::STOP_FAILED:
         {
+            if (now - _stateTimer >= MESSAGE_STATE_TIME)
+                _state_IDLE();
             break;
         }
     }
+
+    // tx, update timers, refresh display, etc.
     updateSync(now);
     updateBattery(now);
     updateIcons();
@@ -147,7 +175,7 @@ void decideNextRequest()
     {
         case TransmitterState::SEARCHING:
             break;
-        case TransmitterState::SYNCING:
+        case TransmitterState::SYNCING: // first ENQ reply has sucessfully been received
             if (_autoRestart)
                 _state_IDLE_AUTO_RESTART();
             else
@@ -170,7 +198,6 @@ void decideNextRequest()
             _activeRequest_ETX();
             break;
     }
-    _requestState_IDLE();
 }
 
 // non-blocking message processing
@@ -204,6 +231,7 @@ void processMessage(const uint32_t now, const uint8_t msg)
             // upper 2 bits of msg -> engState
             _engState = (EngineState)(msg >> 5);
             drawReceiverValues(rxBatt, _engTime, _engState);
+            _requestState_IDLE();
             decideNextRequest();
             break;
         }
@@ -212,7 +240,7 @@ void processMessage(const uint32_t now, const uint8_t msg)
             if (msg == ACK)
                 _state_STARTING(now);
             else
-                _state_REQUEST_ERROR();
+                _state_REQUEST_ERROR(now);
             _requestState_IDLE();
             _activeRequest_ENQ();
             break;
@@ -222,7 +250,7 @@ void processMessage(const uint32_t now, const uint8_t msg)
             if (msg == ACK)
                 _state_STOPPING(now);
             else
-                _state_REQUEST_ERROR();
+                _state_REQUEST_ERROR(now);
             _requestState_IDLE();
             _activeRequest_ENQ();
             break;
@@ -239,7 +267,7 @@ void processButtons(const uint32_t now, bool& btnA, bool& btnC)
     bool btnAPrevState = btnAState;
     debounce(btnAState, !digitalRead(BATT_BUTTON_A),
              btnADbncState, btnADbncTimer, now, BUTTON_DEBOUNCE_TIME);
-    if (!btnAPrevState && btnAState) // on button press
+    if (!btnAPrevState && btnAState) // only on button down
         btnA = true;
     else
         btnA = false;
@@ -250,12 +278,12 @@ void processButtons(const uint32_t now, bool& btnA, bool& btnC)
     bool btnCPrevState = btnCState;
     debounce(btnCState, !digitalRead(BUTTON_C),
              btnCDbncState, btnCDbncTimer, now, BUTTON_DEBOUNCE_TIME);
-    if (!btnCPrevState && btnCState) // on button press
+    if (!btnCPrevState && btnCState) // only on button down
         btnC = true;
     else
         btnC = false;
 
-    updateButtonLabels(btnAState, btnCState);
+    updateButtonLabels(btnAState, btnCState, _engState == EngineState::RUNNING);
 }
 
 uint8_t measureBattery()

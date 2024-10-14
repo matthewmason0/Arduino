@@ -281,12 +281,13 @@ void updateIcons()
     }
 }
 
-void updateButtonLabels(const bool btnAState, const bool btnCState)
+void updateButtonLabels(const bool btnAState, const bool btnCState, const bool engRunning)
 {
+    static bool engRunningPrev = engRunning;
     const uint32_t now = millis();
 
     if (btnAState && !_btnAHighlightActive)
-        drawButtonALabel(F("START"), true);
+        drawButtonALabel(engRunning ? F("AUTO") : F("START"), true);
     if (btnAState) // regardless of _btnAHighlightActive
     {
         _btnAHighlightActive = true;
@@ -295,8 +296,11 @@ void updateButtonLabels(const bool btnAState, const bool btnCState)
     else if (_btnAHighlightActive && (now - _btnAHighlightTimer) >= BUTTON_HIGHLIGHT_TIME)
     {
         _btnAHighlightActive = false;
-        drawButtonALabel(F("START"), false);
+        drawButtonALabel(engRunning ? F("AUTO") : F("START"), false);
     }
+    else if (engRunning != engRunningPrev && !_btnAHighlightActive) // not needed when _btnAHighlightActive
+        drawButtonALabel(engRunning ? F("AUTO") : F("START"), false);
+    engRunningPrev = engRunning;
 
     if (btnCState && !_btnCHighlightActive)
         drawButtonCLabel(F("STOP"), true);

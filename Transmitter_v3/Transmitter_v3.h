@@ -36,9 +36,14 @@ uint32_t _syncTimer = 0;
 static constexpr uint8_t MAX_RETRIES = 10;
 uint8_t _retries = 0;
 
-static constexpr uint32_t ELLIPSES_PERIOD = 300;
+static constexpr uint32_t ELLIPSES_PERIOD = 300; // ms
 uint32_t _ellipsesTimer = 0;
 uint8_t _ellipses = 0;
+
+static constexpr uint32_t MESSAGE_STATE_TIME = 2000; // ms
+static constexpr uint32_t STARTING_TIMEOUT = 15000;
+static constexpr uint32_t STOPPING_TIMEOUT = 15000;
+uint32_t _stateTimer = 0;
 
 bool _autoRestart = false;
 
@@ -82,13 +87,13 @@ enum class TransmitterState
     IDLE_AUTO_RESTART, // connected, _autoRestart TRUE
     REQUESTING_START,
     REQUESTING_STOP,
-    REQUEST_ERROR,
+    REQUEST_ERROR,     // message state
     STARTING,
     STOPPING,
-    START_SUCCEEDED,
-    START_FAILED,
-    STOP_SUCCEEDED,
-    STOP_FAILED
+    START_SUCCEEDED,   // message state
+    START_FAILED,      // message state
+    STOP_SUCCEEDED,    // message state
+    STOP_FAILED        // message state
 };
 TransmitterState _state = TransmitterState::SEARCHING;
 void _state_SEARCHING(const uint32_t now)
@@ -111,12 +116,16 @@ void _state_IDLE()
 {
     println(F("_state IDLE"));
     _state = TransmitterState::IDLE;
+    _autoRestart = false;
+    drawEngineIcon();
     drawStatusText(STR_IDLE, 1);
 }
 void _state_IDLE_AUTO_RESTART()
 {
     println(F("_state IDLE_AUTO_RESTART"));
     _state = TransmitterState::IDLE_AUTO_RESTART;
+    _autoRestart = true;
+    drawEngineAutoIcon();
     drawStatusText(STR_IDLE_AUTO_RESTART, 1);
 }
 void _state_REQUESTING_START(const uint32_t now)
@@ -133,12 +142,16 @@ void _state_REQUESTING_STOP(const uint32_t now)
     _state = TransmitterState::REQUESTING_STOP;
     _ellipsesTimer = now;
     _ellipses = 0;
+    _autoRestart = false; // pressing STOP also deactivates auto restart
+    drawEngineIcon();
     drawStatusText(STR_REQUESTING_STOP, _ellipses);
 }
-void _state_REQUEST_ERROR()
+void _state_REQUEST_ERROR(const uint32_t now)
 {
     println(F("_state REQUEST_ERROR"));
     _state = TransmitterState::REQUEST_ERROR;
+    _stateTimer = now;
+    drawStatusText(STR_REQUEST_ERROR);
 }
 void _state_STARTING(const uint32_t now)
 {
@@ -146,6 +159,7 @@ void _state_STARTING(const uint32_t now)
     _state = TransmitterState::STARTING;
     _ellipsesTimer = now;
     _ellipses = 0;
+    _stateTimer = now;
     drawStatusText(STR_STARTING, _ellipses);
 }
 void _state_STOPPING(const uint32_t now)
@@ -154,27 +168,40 @@ void _state_STOPPING(const uint32_t now)
     _state = TransmitterState::STOPPING;
     _ellipsesTimer = now;
     _ellipses = 0;
+    _stateTimer = now;
     drawStatusText(STR_STOPPING, _ellipses);
 }
-void _state_START_SUCCEEDED()
+void _state_START_SUCCEEDED(const uint32_t now)
 {
     println(F("_state START_SUCCEEDED"));
     _state = TransmitterState::START_SUCCEEDED;
+    _stateTimer = now;
+    _autoRestart = true; // successfull start activates auto restart
+    drawEngineAutoIcon();
+    drawStatusText(STR_START_SUCCEEDED);
 }
-void _state_START_FAILED()
+void _state_START_FAILED(const uint32_t now)
 {
     println(F("_state START_FAILED"));
     _state = TransmitterState::START_FAILED;
+    _stateTimer = now;
+    _autoRestart = false; // failed (re)start deactivates auto restart
+    drawEngineIcon();
+    drawStatusText(STR_START_FAILED);
 }
-void _state_STOP_SUCCEEDED()
+void _state_STOP_SUCCEEDED(const uint32_t now)
 {
     println(F("_state STOP_SUCCEEDED"));
     _state = TransmitterState::STOP_SUCCEEDED;
+    _stateTimer = now;
+    drawStatusText(STR_STOP_SUCCEEDED);
 }
-void _state_STOP_FAILED()
+void _state_STOP_FAILED(const uint32_t now)
 {
     println(F("_state STOP_FAILED"));
     _state = TransmitterState::STOP_FAILED;
+    _stateTimer = now;
+    drawStatusText(STR_STOP_FAILED);
 }
 
 void updateStatusText(const __FlashStringHelper* text, const uint32_t now)
@@ -239,8 +266,8 @@ void _syncState_SYNCED_RX()
     LoRa.singleRx();
 }
 
+// needed for any timers that may be set > millis()
 static constexpr uint32_t MAX_TIMER_DURATION = 0xFFFF; // ms
-
 uint32_t checkTimer(const uint32_t now, const uint32_t timer)
 {
     const uint32_t elapsed = now - timer;
@@ -292,8 +319,6 @@ void updateSync(const uint32_t now)
         }
     }
 }
-
-// need to prevent STX->other, ETX->other while request active
 
 enum class ActiveRequest
 {
